@@ -11,8 +11,8 @@ import {
 export class PlayerController {
   private scene: Scene;
   private playerMesh: Mesh | null = null;
-  private moveSpeed: number = 5.0;
-  private rotationSpeed: number = 0.1;
+  private moveSpeed: number = 15.0; // Increased for faster movement
+  private rotationSpeed: number = 0.15; // Slightly faster rotation
 
   constructor(scene: Scene) {
     this.scene = scene;

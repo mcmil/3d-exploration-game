@@ -9,24 +9,26 @@ export class VirtualJoystick {
     // Create left joystick for movement
     this.joystick = new BabylonJoystick(true); // true = left side
 
+    // Make joystick always visible (not just on touch)
+    this.joystick.alwaysVisible = true;
+
     // Set Christmas colors
     this.joystick.setJoystickColor('red');
 
-    console.log('🕹️  Babylon.js built-in joystick initialized');
+    console.log('🕹️  Babylon.js built-in joystick initialized (always visible)');
   }
 
   public getDirection(): Vector2 {
-    // Babylon's joystick doesn't provide normalized direction directly
-    // We need to check if it's pressed and get the delta
+    // Babylon's joystick provides deltaPosition when pressed
     if (this.joystick.pressed) {
       // deltaPosition gives us the offset from center
       const deltaX = this.joystick.deltaPosition.x;
       const deltaY = this.joystick.deltaPosition.y;
 
-      // Normalize to -1 to 1 range (Babylon joystick max is ~60 pixels)
-      const maxDist = 60;
+      // Babylon joystick max is around 60 pixels, but normalize more aggressively
+      const maxDist = 30; // Smaller value = more sensitive
       this.direction.x = Math.max(-1, Math.min(1, deltaX / maxDist));
-      this.direction.y = Math.max(-1, Math.min(1, -deltaY / maxDist)); // Invert Y
+      this.direction.y = Math.max(-1, Math.min(1, deltaY / maxDist)); // Don't invert yet
 
       return this.direction.clone();
     }

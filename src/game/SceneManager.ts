@@ -81,11 +81,11 @@ export class SceneManager {
     // Mobile-friendly camera settings
     this.camera.attachControl(this.scene.getEngine().getRenderingCanvas(), true);
 
-    // Touch gestures
-    this.camera.pinchPrecision = 50;
-    this.camera.panningSensibility = 1000;
-    this.camera.angularSensibilityX = 1000;
-    this.camera.angularSensibilityY = 1000;
+    // More responsive touch gestures for mobile
+    this.camera.pinchPrecision = 100; // More sensitive zoom
+    this.camera.panningSensibility = 500; // More responsive panning
+    this.camera.angularSensibilityX = 500; // More responsive rotation
+    this.camera.angularSensibilityY = 500;
 
     // Camera limits
     this.camera.lowerRadiusLimit = 5;
@@ -93,8 +93,8 @@ export class SceneManager {
     this.camera.lowerBetaLimit = 0.1;
     this.camera.upperBetaLimit = Math.PI / 2.2;
 
-    // Smooth movement
-    this.camera.inertia = 0.8;
+    // Smoother movement
+    this.camera.inertia = 0.9;
     this.camera.wheelPrecision = 20;
 
     // Update camera target to follow player
