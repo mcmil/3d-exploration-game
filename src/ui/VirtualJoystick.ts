@@ -16,29 +16,29 @@ export class VirtualJoystick {
     this.scene = scene;
     // Outer circle (joystick base) - Christmas red theme
     this.outerCircle = new Ellipse();
-    this.outerCircle.width = '280px';
-    this.outerCircle.height = '280px';
+    this.outerCircle.widthInPixels = 280;
+    this.outerCircle.heightInPixels = 280;
     this.outerCircle.color = '#FF0000'; // Christmas red
     this.outerCircle.thickness = 10; // Very thick border
     this.outerCircle.alpha = 0.95;
     this.outerCircle.background = 'rgba(255, 0, 0, 0.25)'; // Red tint
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.leftInPixels = 140; // Use pixels for exact positioning
+    this.outerCircle.leftInPixels = 140;
     this.outerCircle.topInPixels = -140;
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - Christmas green theme
     this.innerCircle = new Ellipse();
-    this.innerCircle.width = '140px';
-    this.innerCircle.height = '140px';
+    this.innerCircle.widthInPixels = 140;
+    this.innerCircle.heightInPixels = 140;
     this.innerCircle.color = '#00FF00'; // Christmas green
     this.innerCircle.thickness = 10; // Very thick border
     this.innerCircle.background = 'rgba(0, 255, 0, 0.7)'; // Green fill
     this.innerCircle.alpha = 1.0;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.leftInPixels = 140; // Use pixels for exact positioning
+    this.innerCircle.leftInPixels = 140;
     this.innerCircle.topInPixels = -140;
     advancedTexture.addControl(this.innerCircle);
 
@@ -60,12 +60,12 @@ export class VirtualJoystick {
         Math.pow(pointerY - screenCenterY, 2)
       );
 
-      // If touch is in joystick area, prevent default camera behavior
-      const inJoystickArea = distanceFromCenter < 160; // Larger detection area
+      // Touch area matches outer circle radius exactly (280px diameter = 140px radius)
+      const inJoystickArea = distanceFromCenter < 140;
 
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
-          // Only activate if touching in joystick area (within 120px of center)
+          // Only activate if touching within the outer circle
           if (inJoystickArea) {
             this.isActive = true;
             // Prevent camera from handling this event
@@ -83,8 +83,8 @@ export class VirtualJoystick {
           const deltaX = pointerX - screenCenterX;
           const deltaY = pointerY - screenCenterY;
 
-          // Clamp to max distance (larger for bigger joystick)
-          const maxDist = 100; // Increased from 75
+          // Clamp to max distance (70px = half of inner circle can reach edge of outer)
+          const maxDist = 70;
           const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
           let thumbDeltaX = deltaX;
           let thumbDeltaY = deltaY;
