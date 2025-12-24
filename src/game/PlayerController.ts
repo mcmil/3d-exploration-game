@@ -12,7 +12,9 @@ export class PlayerController {
   private scene: Scene;
   private playerMesh: Mesh | null = null;
   private moveSpeed: number = 70.0; // Even faster for very responsive feel
-  private rotationSpeed: number = 0.4; // Even faster rotation
+  private rotationSpeed: number = 0.7; // Much faster rotation for instant direction changes
+  private readonly worldSize: number = 100; // World is 200x200, so ±100 from origin
+  private readonly playerRadius: number = 0.6; // Collision radius
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -137,24 +139,81 @@ export class PlayerController {
       direction.y * this.moveSpeed
     );
 
-    // Apply movement
-    this.playerMesh.position.x += moveDirection.x * deltaTime;
-    this.playerMesh.position.z += moveDirection.z * deltaTime;
+    // Calculate new position
+    const newX = this.playerMesh.position.x + moveDirection.x * deltaTime;
+    const newZ = this.playerMesh.position.z + moveDirection.z * deltaTime;
 
-    // Rotate player to face movement direction
+    // Check world boundaries
+    const clampedX = Math.max(-this.worldSize + this.playerRadius,
+                              Math.min(this.worldSize - this.playerRadius, newX));
+    const clampedZ = Math.max(-this.worldSize + this.playerRadius,
+                              Math.min(this.worldSize - this.playerRadius, newZ));
+
+    // Check collision with objects (houses, trees, boulders)
+    const testPosition = new Vector3(clampedX, this.playerMesh.position.y, clampedZ);
+    const wouldCollide = this.checkCollision(testPosition);
+
+    if (!wouldCollide) {
+      // Apply movement if no collision
+      this.playerMesh.position.x = clampedX;
+      this.playerMesh.position.z = clampedZ;
+    }
+
+    // Rotate player to face movement direction (instant rotation)
     if (length > 0.1) {
       const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
       const currentRotation = this.playerMesh.rotation.y;
 
-      // Smooth rotation
+      // Smooth rotation with very fast speed
       let rotationDiff = targetRotation - currentRotation;
 
-      // Normalize angle difference to -PI to PI
+      // Normalize angle difference to -PI to PI (shortest path)
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
       this.playerMesh.rotation.y += rotationDiff * this.rotationSpeed;
     }
+  }
+
+  private checkCollision(position: Vector3): boolean {
+    // Get all meshes in the scene
+    const meshes = this.scene.meshes;
+
+    for (const mesh of meshes) {
+      // Skip player mesh and its children
+      if (mesh === this.playerMesh || mesh.parent === this.playerMesh) {
+        continue;
+      }
+
+      // Skip meshes without positions (like ground)
+      if (!mesh.position || mesh.name === 'ground' || mesh.name === 'snow') {
+        continue;
+      }
+
+      // Check if mesh is a collidable object (houses, trees, boulders)
+      if (mesh.name.includes('house') ||
+          mesh.name.includes('tree') ||
+          mesh.name.includes('boulder') ||
+          mesh.name.includes('pole')) {
+
+        // Simple distance-based collision detection
+        const dx = position.x - mesh.position.x;
+        const dz = position.z - mesh.position.z;
+        const distance = Math.sqrt(dx * dx + dz * dz);
+
+        // Collision radius based on object type
+        let objectRadius = 2.0; // Default for houses
+        if (mesh.name.includes('tree')) objectRadius = 1.5;
+        if (mesh.name.includes('boulder')) objectRadius = 1.5;
+        if (mesh.name.includes('pole')) objectRadius = 0.5;
+
+        if (distance < this.playerRadius + objectRadius) {
+          return true; // Collision detected
+        }
+      }
+    }
+
+    return false; // No collision
   }
 
   public getMesh(): Mesh | null {
