@@ -29,9 +29,10 @@ export class VirtualJoystick {
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
     // Left edge at 50px (so 200px circle is centered at 150px from left)
     this.outerCircle.leftInPixels = 50;
-    // With BOTTOM alignment, topInPixels is distance FROM bottom
-    // Bottom edge at 50px from bottom (so 200px circle center is at 150px from bottom)
-    this.outerCircle.topInPixels = 50;
+    // With BOTTOM alignment, topInPixels positions TOP edge from bottom of screen
+    // Want center at 150px from bottom, circle is 200px tall (radius 100px)
+    // So TOP edge = center + radius = 150 + 100 = 250px from bottom
+    this.outerCircle.topInPixels = 250;
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - Christmas green theme
@@ -46,8 +47,9 @@ export class VirtualJoystick {
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
     // Left edge at 100px (so 100px circle is centered at 150px from left)
     this.innerCircle.leftInPixels = 100;
-    // Bottom edge at 100px from bottom (so 100px circle center is at 150px from bottom)
-    this.innerCircle.topInPixels = 100;
+    // Want center at 150px from bottom, circle is 100px tall (radius 50px)
+    // So TOP edge = center + radius = 150 + 50 = 200px from bottom
+    this.innerCircle.topInPixels = 200;
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -102,10 +104,10 @@ export class VirtualJoystick {
           // Update thumb position
           // X: left edge = 100 (centered) + thumbDeltaX (right is positive)
           this.innerCircle.leftInPixels = 100 + thumbDeltaX;
-          // Y: With BOTTOM alignment, topInPixels is distance from bottom
-          // Larger values move UP, smaller values move DOWN
-          // Drag down (positive deltaY) should decrease topInPixels
-          this.innerCircle.topInPixels = 100 - thumbDeltaY;
+          // Y: topInPixels positions TOP edge from bottom
+          // Center starts at 150px from bottom, TOP edge at 200px
+          // Drag down (positive deltaY) moves center down: new top = 200 - thumbDeltaY
+          this.innerCircle.topInPixels = 200 - thumbDeltaY;
 
           // Calculate normalized direction for game
           this.direction.x = thumbDeltaX / maxDist;
@@ -122,9 +124,9 @@ export class VirtualJoystick {
           this.isActive = false;
           pointerInfo.event.preventDefault();
 
-          // Reset thumb to center
+          // Reset thumb to center (center at 150px from bottom, TOP edge at 200px)
           this.innerCircle.leftInPixels = 100;
-          this.innerCircle.topInPixels = 100;
+          this.innerCircle.topInPixels = 200;
 
           // Clear direction
           this.direction = Vector2.Zero();
