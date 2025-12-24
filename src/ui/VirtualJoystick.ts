@@ -16,30 +16,30 @@ export class VirtualJoystick {
     this.scene = scene;
     // Outer circle (joystick base) - Christmas red theme
     this.outerCircle = new Ellipse();
-    this.outerCircle.widthInPixels = 280;
-    this.outerCircle.heightInPixels = 280;
+    this.outerCircle.widthInPixels = 200;
+    this.outerCircle.heightInPixels = 200;
     this.outerCircle.color = '#FF0000'; // Christmas red
-    this.outerCircle.thickness = 10; // Very thick border
+    this.outerCircle.thickness = 8; // Thick border
     this.outerCircle.alpha = 0.95;
     this.outerCircle.background = 'rgba(255, 0, 0, 0.25)'; // Red tint
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.leftInPixels = 140;
-    this.outerCircle.topInPixels = -140;
+    this.outerCircle.leftInPixels = 50; // 50px from left edge (center at 150px)
+    this.outerCircle.topInPixels = -50; // 50px from bottom edge (center at 150px from bottom)
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - Christmas green theme
     this.innerCircle = new Ellipse();
-    this.innerCircle.widthInPixels = 140;
-    this.innerCircle.heightInPixels = 140;
+    this.innerCircle.widthInPixels = 100;
+    this.innerCircle.heightInPixels = 100;
     this.innerCircle.color = '#00FF00'; // Christmas green
-    this.innerCircle.thickness = 10; // Very thick border
+    this.innerCircle.thickness = 8; // Thick border
     this.innerCircle.background = 'rgba(0, 255, 0, 0.7)'; // Green fill
     this.innerCircle.alpha = 1.0;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.leftInPixels = 140;
-    this.innerCircle.topInPixels = -140;
+    this.innerCircle.leftInPixels = 100; // 100px from left edge (center at 150px, same as outer)
+    this.innerCircle.topInPixels = -100; // 100px from bottom edge (center at 150px, same as outer)
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -51,17 +51,18 @@ export class VirtualJoystick {
       const pointerX = pointerInfo.event.clientX;
       const pointerY = pointerInfo.event.clientY;
 
-      // Joystick center is at 140px from left, 140px from bottom
-      const screenCenterX = 140;
-      const screenCenterY = window.innerHeight - 140;
+      // Joystick center is at 150px from left, 150px from bottom
+      const screenCenterX = 150;
+      const screenCenterY = window.innerHeight - 150;
 
       const distanceFromCenter = Math.sqrt(
         Math.pow(pointerX - screenCenterX, 2) +
         Math.pow(pointerY - screenCenterY, 2)
       );
 
-      // Touch area matches outer circle radius exactly (280px diameter = 140px radius)
-      const inJoystickArea = distanceFromCenter < 140;
+      // Touch area slightly smaller than outer circle to avoid accidental touches
+      // Outer circle radius is 100px, touch area is 85px
+      const inJoystickArea = distanceFromCenter < 85;
 
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
@@ -83,8 +84,8 @@ export class VirtualJoystick {
           const deltaX = pointerX - screenCenterX;
           const deltaY = pointerY - screenCenterY;
 
-          // Clamp to max distance (70px = half of inner circle can reach edge of outer)
-          const maxDist = 70;
+          // Clamp to max distance (50px = inner circle can reach edge of outer)
+          const maxDist = 50;
           const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
           let thumbDeltaX = deltaX;
           let thumbDeltaY = deltaY;
@@ -96,8 +97,8 @@ export class VirtualJoystick {
           }
 
           // Update thumb position using exact pixels
-          this.innerCircle.leftInPixels = 140 + thumbDeltaX;
-          this.innerCircle.topInPixels = -(140 - thumbDeltaY);
+          this.innerCircle.leftInPixels = 100 + thumbDeltaX;
+          this.innerCircle.topInPixels = -(100 - thumbDeltaY);
 
           // Calculate normalized direction
           this.direction.x = thumbDeltaX / maxDist;
@@ -117,8 +118,8 @@ export class VirtualJoystick {
           pointerInfo.event.preventDefault();
 
           // Reset thumb to center using exact pixels
-          this.innerCircle.leftInPixels = 140;
-          this.innerCircle.topInPixels = -140;
+          this.innerCircle.leftInPixels = 100;
+          this.innerCircle.topInPixels = -100;
 
           // Clear direction
           this.direction = Vector2.Zero();
