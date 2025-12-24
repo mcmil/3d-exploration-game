@@ -115,7 +115,7 @@ export class SceneManager {
   }
 
   private createFallingSnow(): void {
-    const particleSystem = new ParticleSystem('snow', 3000, this.scene);
+    const particleSystem = new ParticleSystem('snow', 2500, this.scene);
 
     // Use a simple white texture
     particleSystem.particleTexture = new Texture(
@@ -128,36 +128,36 @@ export class SceneManager {
     particleSystem.minEmitBox = new Vector3(-120, 0, -120);
     particleSystem.maxEmitBox = new Vector3(120, 0, 120);
 
-    // Bright white particles that stand out against gray ground
-    particleSystem.color1 = new Color4(1, 1, 1, 0.9);
-    particleSystem.color2 = new Color4(0.95, 0.97, 1, 0.95);
-    particleSystem.colorDead = new Color4(0.9, 0.92, 0.95, 0);
+    // Opaque white particles - very visible
+    particleSystem.color1 = new Color4(1, 1, 1, 1);
+    particleSystem.color2 = new Color4(1, 1, 1, 1);
+    particleSystem.colorDead = new Color4(1, 1, 1, 0.2);
 
-    // Larger, more visible snowflakes
-    particleSystem.minSize = 0.4;
-    particleSystem.maxSize = 1.2;
+    // Medium-sized snowflakes
+    particleSystem.minSize = 0.5;
+    particleSystem.maxSize = 1.0;
 
-    particleSystem.minLifeTime = 20;
-    particleSystem.maxLifeTime = 30;
+    particleSystem.minLifeTime = 18;
+    particleSystem.maxLifeTime = 28;
 
-    particleSystem.emitRate = 150; // More snow
+    particleSystem.emitRate = 120;
 
     // Gentle falling with drift
-    particleSystem.direction1 = new Vector3(-1.5, -2.5, -0.8);
-    particleSystem.direction2 = new Vector3(1.5, -2.5, 0.8);
+    particleSystem.direction1 = new Vector3(-1, -3, -0.5);
+    particleSystem.direction2 = new Vector3(1, -3, 0.5);
 
-    particleSystem.gravity = new Vector3(0, -0.3, 0);
+    particleSystem.gravity = new Vector3(0, -0.4, 0);
 
     particleSystem.minAngularSpeed = 0;
-    particleSystem.maxAngularSpeed = Math.PI * 0.5;
+    particleSystem.maxAngularSpeed = Math.PI * 0.3;
 
-    particleSystem.minEmitPower = 0.3;
-    particleSystem.maxEmitPower = 0.8;
+    particleSystem.minEmitPower = 0.4;
+    particleSystem.maxEmitPower = 0.9;
 
-    particleSystem.updateSpeed = 0.015;
+    particleSystem.updateSpeed = 0.012;
 
-    // Blend mode for better visibility
-    particleSystem.blendMode = ParticleSystem.BLENDMODE_ADD;
+    // Standard alpha blending
+    particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
     particleSystem.start();
   }

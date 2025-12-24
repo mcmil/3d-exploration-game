@@ -65,32 +65,33 @@ export class WorldGenerator {
     );
 
     const groundMat = new StandardMaterial('groundMat', this.scene);
-    // Darker snow with blue-gray tint for contrast with particles and roads
-    groundMat.diffuseColor = new Color3(0.75, 0.78, 0.85);
-    groundMat.specularColor = new Color3(0.5, 0.5, 0.6);
-    groundMat.specularPower = 64; // Sharp specular for icy snow
+    // Lighter snow with slight blue tint - still contrasts with white particles
+    groundMat.diffuseColor = new Color3(0.88, 0.90, 0.94);
+    groundMat.specularColor = new Color3(0.6, 0.6, 0.7);
+    groundMat.specularPower = 48; // Moderately sharp for snow
 
-    // Darker ambient for shadows in drifts
-    groundMat.ambientColor = new Color3(0.6, 0.65, 0.75);
+    // Light ambient for bright snow
+    groundMat.ambientColor = new Color3(0.8, 0.82, 0.88);
 
     ground.material = groundMat;
     ground.checkCollisions = true;
     ground.receiveShadows = true;
 
-    // Create dramatic snow drifts and terrain variation
+    // Create VERY dramatic snow drifts and hills
     const positions = ground.getVerticesData('position');
     if (positions) {
       for (let i = 0; i < positions.length; i += 3) {
         const x = positions[i];
         const z = positions[i + 2];
 
-        // Multi-layered noise for realistic terrain
-        const largeDrifts = Math.sin(x * 0.05) * Math.cos(z * 0.05) * 2.5;
-        const mediumDrifts = Math.sin(x * 0.15) * Math.cos(z * 0.12) * 1.2;
-        const smallBumps = Math.sin(x * 0.4) * Math.cos(z * 0.35) * 0.5;
-        const random = (Math.sin(x * 1.3 + z * 0.7) + 1) * 0.3;
+        // Multi-layered noise for dramatic terrain variation
+        const largeDrifts = Math.sin(x * 0.04) * Math.cos(z * 0.04) * 4.0; // Doubled
+        const mediumDrifts = Math.sin(x * 0.12) * Math.cos(z * 0.11) * 2.0; // Increased
+        const smallBumps = Math.sin(x * 0.35) * Math.cos(z * 0.32) * 0.8;
+        const ridges = Math.sin(x * 0.08 + z * 0.08) * 1.5; // Add ridges
+        const random = (Math.sin(x * 1.1 + z * 0.9) + 1) * 0.4;
 
-        const height = largeDrifts + mediumDrifts + smallBumps + random;
+        const height = largeDrifts + mediumDrifts + smallBumps + ridges + random;
         positions[i + 1] = height; // y position
       }
       ground.updateVerticesData('position', positions);
@@ -130,12 +131,19 @@ export class WorldGenerator {
 
   private generateTrees(numTrees: number, mapSize: number): void {
     for (let i = 0; i < numTrees; i++) {
-      // Random position, but not too close to center (where player spawns)
+      // Random position avoiding spawn point AND roads
       let x, z;
+      let attempts = 0;
       do {
         x = (Math.random() - 0.5) * mapSize * 0.9;
         z = (Math.random() - 0.5) * mapSize * 0.9;
-      } while (Math.sqrt(x * x + z * z) < 10); // At least 10 units from center
+        attempts++;
+        if (attempts > 100) break; // Prevent infinite loop
+      } while (
+        Math.sqrt(x * x + z * z) < 10 || // At least 10 units from spawn
+        (Math.abs(x) < 4 && Math.abs(z) < mapSize / 2) || // Not on vertical road
+        (Math.abs(z) < 4 && Math.abs(x) < mapSize / 2)    // Not on horizontal road
+      );
 
       const height = 4 + Math.random() * 3; // Random height 4-7
       const tree = this.treeBuilder.createPineTree(new Vector3(x, 0, z), height);
