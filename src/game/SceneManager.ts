@@ -126,13 +126,13 @@ export class SceneManager {
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
-      // Draw white circle with soft edges
+      // Draw white circle with sharper edges (less fuzzy)
       const gradient = ctx.createRadialGradient(
         textureSize / 2, textureSize / 2, 0,
         textureSize / 2, textureSize / 2, textureSize / 2
       );
       gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.9)');
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
       ctx.fillStyle = gradient;
@@ -153,9 +153,9 @@ export class SceneManager {
     particleSystem.color2 = new Color4(0.95, 0.98, 1, 1); // Slight blue tint
     particleSystem.colorDead = new Color4(1, 1, 1, 0.3);
 
-    // MUCH LARGER snowflakes - highly visible
-    particleSystem.minSize = 1.5;
-    particleSystem.maxSize = 3.0;
+    // Smaller, crisper snowflakes
+    particleSystem.minSize = 0.8;
+    particleSystem.maxSize = 1.5;
 
     particleSystem.minLifeTime = 18;
     particleSystem.maxLifeTime = 28;
