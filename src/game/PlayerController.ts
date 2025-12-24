@@ -11,8 +11,8 @@ import {
 export class PlayerController {
   private scene: Scene;
   private playerMesh: Mesh | null = null;
-  private moveSpeed: number = 50.0; // Very fast for arcade-style movement
-  private rotationSpeed: number = 0.3; // Very fast rotation
+  private moveSpeed: number = 70.0; // Even faster for very responsive feel
+  private rotationSpeed: number = 0.4; // Even faster rotation
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -126,24 +126,30 @@ export class PlayerController {
     const length = direction.length();
     if (length === 0) return;
 
-    // Calculate movement direction (relative to world, not camera)
     const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
+
+    // Get current player rotation
+    const playerRotation = this.playerMesh.rotation.y;
+
+    // Rotate input direction by player's facing direction
+    // direction.y (forward on joystick) should move in the direction player is facing
+    // direction.x (strafe on joystick) should move perpendicular to facing
+    const rotatedX = direction.x * Math.cos(playerRotation) - direction.y * Math.sin(playerRotation);
+    const rotatedZ = direction.x * Math.sin(playerRotation) + direction.y * Math.cos(playerRotation);
+
     const moveDirection = new Vector3(
-      direction.x * this.moveSpeed,
+      rotatedX * this.moveSpeed,
       0,
-      direction.y * this.moveSpeed
+      rotatedZ * this.moveSpeed
     );
 
-    // Simple position-based movement
-    const newX = this.playerMesh.position.x + moveDirection.x * deltaTime;
-    const newZ = this.playerMesh.position.z + moveDirection.z * deltaTime;
+    // Apply movement
+    this.playerMesh.position.x += moveDirection.x * deltaTime;
+    this.playerMesh.position.z += moveDirection.z * deltaTime;
 
-    this.playerMesh.position.x = newX;
-    this.playerMesh.position.z = newZ;
-
-    // Rotate player to face movement direction
-    if (moveDirection.length() > 0.1) {
-      const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
+    // Rotate player to face movement direction (only if moving)
+    if (length > 0.1) {
+      const targetRotation = Math.atan2(rotatedX, rotatedZ);
       const currentRotation = this.playerMesh.rotation.y;
 
       // Smooth rotation
