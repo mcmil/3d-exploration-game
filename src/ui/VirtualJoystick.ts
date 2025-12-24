@@ -23,9 +23,10 @@ export class VirtualJoystick {
     this.outerCircle.alpha = 0.95;
     this.outerCircle.background = 'rgba(255, 0, 0, 0.25)'; // Red tint
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-    this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.leftInPixels = 50; // 50px from left edge (center at 150px)
-    this.outerCircle.topInPixels = -50; // 50px from bottom edge (center at 150px from bottom)
+    this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    // Left edge at 50px (center at 150px for 200px wide circle)
+    this.outerCircle.leftInPixels = 50;
+    this.outerCircle.topInPixels = 0; // Will be set dynamically based on screen height
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - Christmas green theme
@@ -37,12 +38,24 @@ export class VirtualJoystick {
     this.innerCircle.background = 'rgba(0, 255, 0, 0.7)'; // Green fill
     this.innerCircle.alpha = 1.0;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-    this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.leftInPixels = 100; // 100px from left edge (center at 150px, same as outer)
-    this.innerCircle.topInPixels = -100; // 100px from bottom edge (center at 150px, same as outer)
+    this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    // Left edge at 100px (center at 150px for 100px wide circle)
+    this.innerCircle.leftInPixels = 100;
+    this.innerCircle.topInPixels = 0; // Will be set dynamically
     advancedTexture.addControl(this.innerCircle);
 
+    // Set initial Y position based on screen height
+    this.updateVerticalPosition();
+
     this.setupPointerEvents();
+  }
+
+  private updateVerticalPosition(): void {
+    // Position circles so their centers are at 150px from bottom
+    // Outer circle: top edge at (window.innerHeight - 150 - 100) = height - 250
+    // Inner circle: top edge at (window.innerHeight - 150 - 50) = height - 200
+    this.outerCircle.topInPixels = window.innerHeight - 250;
+    this.innerCircle.topInPixels = window.innerHeight - 200;
   }
 
   private setupPointerEvents(): void {
@@ -96,9 +109,11 @@ export class VirtualJoystick {
             thumbDeltaY = Math.sin(angle) * maxDist;
           }
 
-          // Update thumb position using exact pixels
+          // Update thumb position (offset from center)
+          // Center is at X=150, so left edge = 100 + delta
           this.innerCircle.leftInPixels = 100 + thumbDeltaX;
-          this.innerCircle.topInPixels = -(100 - thumbDeltaY);
+          // Center is at Y=150 from bottom, top edge = height - 200 - delta
+          this.innerCircle.topInPixels = window.innerHeight - 200 - thumbDeltaY;
 
           // Calculate normalized direction
           this.direction.x = thumbDeltaX / maxDist;
@@ -117,9 +132,9 @@ export class VirtualJoystick {
           // Prevent camera from handling this event
           pointerInfo.event.preventDefault();
 
-          // Reset thumb to center using exact pixels
+          // Reset thumb to center
           this.innerCircle.leftInPixels = 100;
-          this.innerCircle.topInPixels = -100;
+          this.innerCircle.topInPixels = window.innerHeight - 200;
 
           // Clear direction
           this.direction = Vector2.Zero();
