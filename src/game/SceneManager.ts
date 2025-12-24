@@ -8,6 +8,8 @@ import {
   Color4,
   SceneOptimizer,
   SceneOptimizerOptions,
+  ParticleSystem,
+  Texture,
 } from '@babylonjs/core';
 import { WorldGenerator } from './WorldGenerator';
 
@@ -21,8 +23,8 @@ export class SceneManager {
   }
 
   private setupScene(): void {
-    // Set clear color (winter overcast sky)
-    this.scene.clearColor = new Color4(0.7, 0.75, 0.8, 1.0);
+    // Set clear color (dark winter evening sky)
+    this.scene.clearColor = new Color4(0.2, 0.25, 0.35, 1.0);
 
     // Enable collision detection
     this.scene.collisionsEnabled = true;
@@ -98,14 +100,62 @@ export class SceneManager {
     const worldGen = new WorldGenerator(this.scene);
 
     worldGen.generateWorld({
-      mapSize: 100,
-      numHouses: 18,
-      numTrees: 35,
-      numPowerPoles: 12,
+      mapSize: 200,
+      numHouses: 25,
+      numTrees: 50,
+      numPowerPoles: 16,
+      numBoulders: 30,
     });
 
     console.log('🏠 Generated', worldGen.getHouses().length, 'houses');
     console.log('🌲 Generated', worldGen.getTrees().length, 'trees');
+
+    // Add falling snow
+    this.createFallingSnow();
+  }
+
+  private createFallingSnow(): void {
+    const particleSystem = new ParticleSystem('snow', 2000, this.scene);
+
+    // Use a simple white texture
+    particleSystem.particleTexture = new Texture(
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAA+SURBVBiVY/j//z8DKYAJmzz7//8MYP7//wwM//8zMPz/z8Dw/z8Dw///DAz//zMw/P/PwPD/PwPD//8MDAwAALsXJ9VwXVfDAAAAAElFTkSuQmCC',
+      this.scene
+    );
+
+    // Emission area - large box above the map
+    particleSystem.emitter = new Vector3(0, 40, 0);
+    particleSystem.minEmitBox = new Vector3(-100, 0, -100);
+    particleSystem.maxEmitBox = new Vector3(100, 0, 100);
+
+    // Particle properties
+    particleSystem.color1 = new Color4(1, 1, 1, 1);
+    particleSystem.color2 = new Color4(0.9, 0.9, 1, 1);
+    particleSystem.colorDead = new Color4(1, 1, 1, 0);
+
+    particleSystem.minSize = 0.3;
+    particleSystem.maxSize = 0.8;
+
+    particleSystem.minLifeTime = 15;
+    particleSystem.maxLifeTime = 25;
+
+    particleSystem.emitRate = 100;
+
+    // Falling direction
+    particleSystem.direction1 = new Vector3(-1, -3, -0.5);
+    particleSystem.direction2 = new Vector3(1, -3, 0.5);
+
+    particleSystem.gravity = new Vector3(0, -0.5, 0);
+
+    particleSystem.minAngularSpeed = 0;
+    particleSystem.maxAngularSpeed = Math.PI;
+
+    particleSystem.minEmitPower = 0.5;
+    particleSystem.maxEmitPower = 1;
+
+    particleSystem.updateSpeed = 0.01;
+
+    particleSystem.start();
   }
 
   public update(): void {

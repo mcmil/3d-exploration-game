@@ -14,6 +14,7 @@ export interface WorldConfig {
   numHouses: number;
   numTrees: number;
   numPowerPoles: number;
+  numBoulders: number;
 }
 
 export class WorldGenerator {
@@ -30,7 +31,7 @@ export class WorldGenerator {
   }
 
   public generateWorld(config: WorldConfig): void {
-    // Create snowy ground
+    // Create snowy ground with texture
     this.createSnowGround(config.mapSize);
 
     // Generate houses in a grid with some randomness
@@ -42,29 +43,60 @@ export class WorldGenerator {
     // Add central Christmas tree
     this.addCentralChristmasTree();
 
+    // Add boulders for variety
+    this.generateBoulders(config.numBoulders, config.mapSize);
+
     // Add roads (simple paths between houses)
     this.createRoads(config.mapSize);
 
     // Add power poles
     this.generatePowerPoles(config.numPowerPoles, config.mapSize);
 
-    // Add repair van at spawn point
+    // Add detailed repair van at spawn point
     this.createRepairVan();
   }
 
   private createSnowGround(size: number): void {
-    const ground = MeshBuilder.CreateGround(
+    // Create ground with subdivisions for detail
+    const ground = MeshBuilder.CreateGroundFromHeightMap(
       'snowGround',
-      { width: size, height: size },
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', // 1x1 transparent
+      {
+        width: size,
+        height: size,
+        subdivisions: 100,
+        minHeight: 0,
+        maxHeight: 0,
+      },
       this.scene
     );
 
     const groundMat = new StandardMaterial('groundMat', this.scene);
-    groundMat.diffuseColor = new Color3(0.95, 0.95, 1.0); // Slightly blue-white snow
-    groundMat.specularColor = new Color3(0.2, 0.2, 0.2); // Some shine
+    groundMat.diffuseColor = new Color3(0.92, 0.94, 0.98); // Cool white snow
+    groundMat.specularColor = new Color3(0.4, 0.4, 0.45); // More shine for snow
+    groundMat.specularPower = 32; // Crisp specular highlights
+
+    // Add slight ambient color for depth
+    groundMat.ambientColor = new Color3(0.85, 0.88, 0.92);
+
     ground.material = groundMat;
     ground.checkCollisions = true;
     ground.receiveShadows = true;
+
+    // Add small snow drifts (bumps) for variety
+    const positions = ground.getVerticesData('position');
+    if (positions) {
+      for (let i = 0; i < positions.length; i += 3) {
+        const x = positions[i];
+        const z = positions[i + 2];
+        // Simple noise-like pattern for snow drifts
+        const drift = Math.sin(x * 0.3) * Math.cos(z * 0.3) * 0.3 +
+                     Math.sin(x * 0.1) * Math.cos(z * 0.15) * 0.5;
+        positions[i + 1] = drift; // y position
+      }
+      ground.updateVerticesData('position', positions);
+      ground.createNormals(true);
+    }
   }
 
   private generateHouses(numHouses: number, mapSize: number): void {
@@ -119,6 +151,57 @@ export class WorldGenerator {
       8
     );
     this.trees.push(christmasTree);
+  }
+
+  private generateBoulders(numBoulders: number, mapSize: number): void {
+    const boulderMat = new StandardMaterial('boulderMat', this.scene);
+    boulderMat.diffuseColor = new Color3(0.5, 0.5, 0.6); // Gray stone
+    boulderMat.specularColor = new Color3(0.1, 0.1, 0.1);
+
+    const snowMat = new StandardMaterial('boulderSnowMat', this.scene);
+    snowMat.diffuseColor = new Color3(1, 1, 1);
+
+    for (let i = 0; i < numBoulders; i++) {
+      // Random position, avoiding center spawn
+      let x, z;
+      do {
+        x = (Math.random() - 0.5) * mapSize * 0.85;
+        z = (Math.random() - 0.5) * mapSize * 0.85;
+      } while (Math.sqrt(x * x + z * z) < 15); // Keep away from spawn
+
+      const size = 1 + Math.random() * 2; // Random size 1-3
+
+      // Create irregular boulder (slightly squashed sphere)
+      const boulder = MeshBuilder.CreateSphere(
+        'boulder',
+        {
+          diameter: size,
+          segments: 8, // Low poly for rocky look
+        },
+        this.scene
+      );
+      boulder.position.set(x, size * 0.3, z); // Partially buried
+      boulder.scaling.y = 0.6 + Math.random() * 0.4; // Flatten slightly
+      boulder.scaling.x = 0.8 + Math.random() * 0.4;
+      boulder.scaling.z = 0.8 + Math.random() * 0.4;
+      boulder.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      );
+      boulder.material = boulderMat;
+      boulder.checkCollisions = true;
+
+      // Add snow cap on top
+      const snowCap = MeshBuilder.CreateSphere(
+        'snowCap',
+        { diameter: size * 0.6, segments: 8, slice: 0.6 },
+        this.scene
+      );
+      snowCap.position.y = size * 0.4;
+      snowCap.parent = boulder;
+      snowCap.material = snowMat;
+    }
   }
 
   private createRoads(mapSize: number): void {
@@ -179,62 +262,157 @@ export class WorldGenerator {
   }
 
   private createRepairVan(): void {
-    // Simple van at spawn point
+    const vanParent = new Mesh('repairVan', this.scene);
+    vanParent.position.set(0, 0, -5);
+
+    // Main van body
     const van = MeshBuilder.CreateBox(
-      'van',
+      'vanBody',
       { width: 3, height: 2, depth: 4 },
       this.scene
     );
-    van.position.set(0, 1, -5);
+    van.position.y = 1;
+    van.parent = vanParent;
 
     const vanMat = new StandardMaterial('vanMat', this.scene);
     vanMat.diffuseColor = new Color3(1, 0.5, 0); // Orange van
+    vanMat.specularColor = new Color3(0.3, 0.3, 0.3);
     van.material = vanMat;
 
-    // Van roof
-    const roof = MeshBuilder.CreateBox(
-      'vanRoof',
-      { width: 2.8, height: 0.5, depth: 2 },
+    // Van cab/roof
+    const cab = MeshBuilder.CreateBox(
+      'vanCab',
+      { width: 2.8, height: 1.2, depth: 2 },
       this.scene
     );
-    roof.position.set(0, 1.25, -5.5);
-    roof.parent = van;
-    roof.material = vanMat;
+    cab.position.set(0, 2.1, -0.5);
+    cab.parent = vanParent;
+    cab.material = vanMat;
 
-    // Wheels
+    // Windshield
+    const windshieldMat = new StandardMaterial('windshieldMat', this.scene);
+    windshieldMat.diffuseColor = new Color3(0.6, 0.7, 0.8);
+    windshieldMat.alpha = 0.6;
+
+    const windshield = MeshBuilder.CreatePlane(
+      'windshield',
+      { width: 2.6, height: 1 },
+      this.scene
+    );
+    windshield.position.set(0, 2.1, 0.51);
+    windshield.rotation.x = -Math.PI / 12;
+    windshield.parent = vanParent;
+    windshield.material = windshieldMat;
+
+    // Wheels with treads
     const wheelMat = new StandardMaterial('wheelMat', this.scene);
     wheelMat.diffuseColor = new Color3(0.1, 0.1, 0.1);
 
     const wheelPositions = [
-      [-1, 0.3, -6.5],
-      [1, 0.3, -6.5],
-      [-1, 0.3, -3.5],
-      [1, 0.3, -3.5],
+      [-1.2, 0.4, -1.5],
+      [1.2, 0.4, -1.5],
+      [-1.2, 0.4, 1.3],
+      [1.2, 0.4, 1.3],
     ];
 
     wheelPositions.forEach((pos) => {
       const wheel = MeshBuilder.CreateCylinder(
         'wheel',
-        { diameter: 0.8, height: 0.3 },
+        { diameter: 0.8, height: 0.4 },
         this.scene
       );
       wheel.rotation.z = Math.PI / 2;
       wheel.position.set(pos[0], pos[1], pos[2]);
+      wheel.parent = vanParent;
       wheel.material = wheelMat;
     });
 
-    // Label on side
-    const label = MeshBuilder.CreatePlane(
-      'vanLabel',
-      { width: 2, height: 0.5 },
+    // Headlights
+    const headlightMat = new StandardMaterial('headlightMat', this.scene);
+    headlightMat.diffuseColor = new Color3(1, 1, 0.8);
+    headlightMat.emissiveColor = new Color3(0.5, 0.5, 0.4);
+
+    [-0.8, 0.8].forEach((x) => {
+      const headlight = MeshBuilder.CreateSphere(
+        'headlight',
+        { diameter: 0.3, segments: 8 },
+        this.scene
+      );
+      headlight.position.set(x, 0.8, 2.01);
+      headlight.scaling.z = 0.5;
+      headlight.parent = vanParent;
+      headlight.material = headlightMat;
+    });
+
+    // Emergency light bar on roof
+    const lightBarBase = MeshBuilder.CreateBox(
+      'lightBar',
+      { width: 2, height: 0.2, depth: 0.5 },
       this.scene
     );
-    label.position.set(1.51, 1.5, -5);
+    lightBarBase.position.set(0, 2.8, -0.5);
+    lightBarBase.parent = vanParent;
+
+    const lightBarMat = new StandardMaterial('lightBarMat', this.scene);
+    lightBarMat.diffuseColor = new Color3(0.2, 0.2, 0.2);
+    lightBarBase.material = lightBarMat;
+
+    // Red/blue emergency lights
+    [-0.5, 0.5].forEach((x, i) => {
+      const light = MeshBuilder.CreateSphere(
+        'emergencyLight',
+        { diameter: 0.25 },
+        this.scene
+      );
+      light.position.set(x, 2.95, -0.5);
+      light.parent = vanParent;
+
+      const lightMat = new StandardMaterial('emergencyLightMat', this.scene);
+      lightMat.diffuseColor = i === 0 ? new Color3(1, 0, 0) : new Color3(0, 0.3, 1);
+      lightMat.emissiveColor = i === 0 ? new Color3(0.8, 0, 0) : new Color3(0, 0.2, 0.8);
+      light.material = lightMat;
+    });
+
+    // Side label "NAPRAWA AWARYJNA"
+    const label = MeshBuilder.CreatePlane(
+      'vanLabel',
+      { width: 2.5, height: 0.6 },
+      this.scene
+    );
+    label.position.set(1.51, 1.5, 0);
     label.rotation.y = -Math.PI / 2;
+    label.parent = vanParent;
 
     const labelMat = new StandardMaterial('labelMat', this.scene);
     labelMat.diffuseColor = new Color3(1, 1, 1);
+    labelMat.emissiveColor = new Color3(0.3, 0.3, 0.3);
     label.material = labelMat;
+
+    // Front bumper
+    const bumper = MeshBuilder.CreateBox(
+      'bumper',
+      { width: 3.2, height: 0.3, depth: 0.3 },
+      this.scene
+    );
+    bumper.position.set(0, 0.5, 2.15);
+    bumper.parent = vanParent;
+
+    const bumperMat = new StandardMaterial('bumperMat', this.scene);
+    bumperMat.diffuseColor = new Color3(0.15, 0.15, 0.15);
+    bumper.material = bumperMat;
+
+    // Tool box on back
+    const toolBox = MeshBuilder.CreateBox(
+      'toolBox',
+      { width: 2, height: 0.8, depth: 0.8 },
+      this.scene
+    );
+    toolBox.position.set(0, 0.7, -2.4);
+    toolBox.parent = vanParent;
+
+    const toolBoxMat = new StandardMaterial('toolBoxMat', this.scene);
+    toolBoxMat.diffuseColor = new Color3(0.6, 0.6, 0.6);
+    toolBox.material = toolBoxMat;
   }
 
   public getHouses(): Mesh[] {

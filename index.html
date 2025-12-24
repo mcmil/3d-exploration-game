@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
 
-  <title>3D Exploration Game</title>
+  <title>Święta Awaria w Szczecinie - Christmas Emergency Game</title>
 
   <style>
     * {
@@ -45,13 +45,37 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(180deg, #1a2333 0%, #2d1b1b 50%, #1a2333 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       transition: opacity 0.5s;
+      overflow: hidden;
+    }
+
+    #loadingScreen::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 60% 70%, white, transparent),
+        radial-gradient(1px 1px at 50% 50%, white, transparent),
+        radial-gradient(1px 1px at 80% 10%, white, transparent),
+        radial-gradient(2px 2px at 90% 60%, white, transparent),
+        radial-gradient(1px 1px at 33% 80%, white, transparent);
+      background-size: 200px 200px, 300px 300px, 150px 150px, 250px 250px, 180px 180px, 220px 220px;
+      animation: snowfall 20s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes snowfall {
+      to { transform: translateY(100px); }
     }
 
     #loadingScreen.hidden {
@@ -62,19 +86,49 @@
     .loading-content {
       text-align: center;
       color: white;
+      position: relative;
+      z-index: 1;
+      background: rgba(0,0,0,0.5);
+      padding: 3rem 2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.2);
     }
 
     .loading-content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+      background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #a8dadc;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .game-info {
+      font-size: 0.9rem;
+      color: #f1faee;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      max-width: 400px;
     }
 
     .loading-spinner {
       width: 50px;
       height: 50px;
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top-color: white;
+      border: 4px solid rgba(255,107,107,0.3);
+      border-top-color: #ff6b6b;
+      border-right-color: #ffd93d;
+      border-bottom-color: #6bcf7f;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 1rem;
@@ -85,36 +139,58 @@
     }
 
     .loading-text {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       opacity: 0.9;
+      color: #ffd93d;
     }
 
     #startButton {
       display: none;
       margin-top: 2rem;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      background: white;
-      color: #667eea;
+      padding: 1.2rem 3rem;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #ff6b6b, #ff8787);
+      color: white;
       border: none;
       border-radius: 50px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+      text-transform: uppercase;
     }
 
     #startButton:active {
       transform: scale(0.95);
+      box-shadow: 0 3px 10px rgba(255,107,107,0.6);
+    }
+
+    .emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="loading-content">
-      <h1>🎮 3D Explorer</h1>
+      <div class="emoji">🎄❄️🔧</div>
+      <h1>Święta Awaria</h1>
+      <div class="subtitle">w Szczecinie</div>
+      <div class="game-info">
+        Wigilia w Zachodniopomorskim!<br>
+        Napraw prąd, satelity i urządzenia<br>
+        zanim rodziny zasiadą do kolacji.
+      </div>
       <div class="loading-spinner"></div>
-      <div class="loading-text">Loading...</div>
-      <button id="startButton">Tap to Start</button>
+      <div class="loading-text">Ładowanie...</div>
+      <button id="startButton">Rozpocznij Misję!</button>
     </div>
   </div>
 
