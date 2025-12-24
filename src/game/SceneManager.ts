@@ -2,6 +2,7 @@ import {
   Scene,
   Engine,
   ArcRotateCamera,
+  FollowCamera,
   HemisphericLight,
   Vector3,
   Color3,
@@ -10,12 +11,16 @@ import {
   SceneOptimizerOptions,
   ParticleSystem,
   Texture,
+  CannonJSPlugin,
 } from '@babylonjs/core';
+import * as CANNON from 'cannon-es';
 import { WorldGenerator } from './WorldGenerator';
+import { PlayerController } from './PlayerController';
 
 export class SceneManager {
   private scene: Scene;
-  private camera: ArcRotateCamera | null = null;
+  private camera: ArcRotateCamera | FollowCamera | null = null;
+  private player: PlayerController | null = null;
 
   constructor(engine: Engine) {
     this.scene = new Scene(engine);
@@ -29,56 +34,68 @@ export class SceneManager {
     // Enable collision detection
     this.scene.collisionsEnabled = true;
 
+    // Initialize physics with Cannon.js
+    const gravityVector = new Vector3(0, -9.81, 0);
+    const physicsPlugin = new CannonJSPlugin(true, 10, CANNON);
+    this.scene.enablePhysics(gravityVector, physicsPlugin);
+
     // Configure scene optimizer for automatic quality adjustment
     const options = SceneOptimizerOptions.ModerateDegradationAllowed();
     SceneOptimizer.OptimizeAsync(this.scene, options);
+
+    console.log('⚙️ Physics engine initialized (Cannon.js)');
   }
 
   public async createScene(): Promise<void> {
-    // Create camera
-    this.createCamera();
-
     // Create lighting
     this.createLighting();
 
     // Create environment
     this.createEnvironment();
 
+    // Create player
+    await this.createPlayer();
+
+    // Create camera (must be after player for follow camera)
+    this.createCamera();
+
     console.log('✨ Scene created successfully!');
   }
 
+  private async createPlayer(): Promise<void> {
+    this.player = new PlayerController(this.scene);
+    await this.player.create();
+  }
+
   private createCamera(): void {
-    // ArcRotateCamera for easy touch control (orbital camera)
-    this.camera = new ArcRotateCamera(
-      'camera',
-      -Math.PI / 2, // Alpha (horizontal rotation)
-      Math.PI / 3,  // Beta (vertical rotation)
-      15,           // Radius (distance from target)
-      new Vector3(0, 2, 0), // Target position
+    if (!this.player || !this.player.getMesh()) {
+      console.error('Cannot create camera: player not initialized');
+      return;
+    }
+
+    // FollowCamera for third-person view
+    this.camera = new FollowCamera(
+      'followCam',
+      new Vector3(0, 5, -10),
       this.scene
     );
 
-    // Mobile-friendly camera settings
-    this.camera.attachControl(this.scene.getEngine().getRenderingCanvas(), true);
+    // Follow the player
+    this.camera.lockedTarget = this.player.getMesh();
 
-    // Touch gestures
-    this.camera.pinchPrecision = 50; // Pinch to zoom sensitivity
-    this.camera.panningSensibility = 1000; // Pan sensitivity
-    this.camera.angularSensibilityX = 1000; // Horizontal rotation sensitivity
-    this.camera.angularSensibilityY = 1000; // Vertical rotation sensitivity
+    // Camera positioning
+    this.camera.radius = 12; // Distance from player
+    this.camera.heightOffset = 4; // Height above player
+    this.camera.rotationOffset = 0; // Rotation around player (0 = behind)
 
-    // Camera limits
-    this.camera.lowerRadiusLimit = 5;  // Minimum zoom
-    this.camera.upperRadiusLimit = 30; // Maximum zoom
-    this.camera.lowerBetaLimit = 0.1;  // Don't go below ground
-    this.camera.upperBetaLimit = Math.PI / 2.2; // Don't flip over
+    // Camera movement settings
+    this.camera.cameraAcceleration = 0.05; // How quickly camera catches up
+    this.camera.maxCameraSpeed = 10; // Maximum camera speed
 
-    // Smooth camera movement
-    this.camera.inertia = 0.8;
-    this.camera.wheelPrecision = 20;
+    // Attach controls (FollowCamera only takes one parameter)
+    this.camera.attachControl(true);
 
-    // Enable collision for camera
-    this.camera.checkCollisions = true;
+    console.log('📷 Follow camera created');
   }
 
   private createLighting(): void {
@@ -190,6 +207,10 @@ export class SceneManager {
 
   public getScene(): Scene {
     return this.scene;
+  }
+
+  public getPlayer(): PlayerController | null {
+    return this.player;
   }
 
   public dispose(): void {

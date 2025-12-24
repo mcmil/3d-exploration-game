@@ -1,10 +1,13 @@
 import { Engine, Scene } from '@babylonjs/core';
+import { AdvancedDynamicTexture } from '@babylonjs/gui';
 import { SceneManager } from './SceneManager';
+import { VirtualJoystick } from '../ui/VirtualJoystick';
 
 export class GameEngine {
   private engine: Engine;
   private canvas: HTMLCanvasElement;
   private sceneManager: SceneManager | null = null;
+  private joystick: VirtualJoystick | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -46,14 +49,26 @@ export class GameEngine {
     this.sceneManager = new SceneManager(this.engine);
     await this.sceneManager.createScene();
 
+    // Create GUI and virtual joystick
+    const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
+    this.joystick = new VirtualJoystick(advancedTexture);
+
     // Start render loop
     this.engine.runRenderLoop(() => {
       if (this.sceneManager) {
+        // Update player movement based on joystick input
+        const player = this.sceneManager.getPlayer();
+        if (player && this.joystick) {
+          const direction = this.joystick.getDirection();
+          player.move(direction);
+        }
+
         this.sceneManager.update();
       }
     });
 
     console.log('🎮 Game engine initialized!');
+    console.log('🕹️  Virtual joystick ready (bottom-left)');
   }
 
   public getScene(): Scene | null {
