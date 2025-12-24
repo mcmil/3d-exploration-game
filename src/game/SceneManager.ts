@@ -4,13 +4,12 @@ import {
   ArcRotateCamera,
   HemisphericLight,
   Vector3,
-  MeshBuilder,
-  StandardMaterial,
   Color3,
   Color4,
   SceneOptimizer,
   SceneOptimizerOptions,
 } from '@babylonjs/core';
+import { WorldGenerator } from './WorldGenerator';
 
 export class SceneManager {
   private scene: Scene;
@@ -22,8 +21,8 @@ export class SceneManager {
   }
 
   private setupScene(): void {
-    // Set clear color (sky blue)
-    this.scene.clearColor = new Color4(0.5, 0.8, 1.0, 1.0);
+    // Set clear color (winter overcast sky)
+    this.scene.clearColor = new Color4(0.7, 0.75, 0.8, 1.0);
 
     // Enable collision detection
     this.scene.collisionsEnabled = true;
@@ -81,101 +80,32 @@ export class SceneManager {
   }
 
   private createLighting(): void {
-    // Hemispheric light (ambient + directional, very mobile-friendly)
+    // Hemispheric light for winter day (cooler tones)
     const light = new HemisphericLight(
-      'light',
+      'winterLight',
       new Vector3(0, 1, 0),
       this.scene
     );
 
-    light.intensity = 1.0;
-    light.diffuse = new Color3(1, 1, 1);
-    light.specular = new Color3(0.5, 0.5, 0.5);
-    light.groundColor = new Color3(0.3, 0.3, 0.5);
+    light.intensity = 1.2; // Brighter for snow reflection
+    light.diffuse = new Color3(0.95, 0.95, 1.0); // Slightly blue-white
+    light.specular = new Color3(0.7, 0.7, 0.8);
+    light.groundColor = new Color3(0.4, 0.4, 0.5); // Cool ground reflection
   }
 
   private createEnvironment(): void {
-    // Create ground
-    const ground = MeshBuilder.CreateGround(
-      'ground',
-      { width: 50, height: 50 },
-      this.scene
-    );
+    // Generate winter world with houses and trees
+    const worldGen = new WorldGenerator(this.scene);
 
-    const groundMaterial = new StandardMaterial('groundMat', this.scene);
-    groundMaterial.diffuseColor = new Color3(0.4, 0.8, 0.4); // Green grass
-    groundMaterial.specularColor = new Color3(0.1, 0.1, 0.1); // Low specular
-    ground.material = groundMaterial;
-    ground.checkCollisions = true;
-
-    // Create some colorful boxes to explore
-    this.createBox(new Vector3(0, 1, 0), new Color3(1, 0.2, 0.2), 2); // Red
-    this.createBox(new Vector3(5, 1, 5), new Color3(0.2, 1, 0.2), 2); // Green
-    this.createBox(new Vector3(-5, 1, 5), new Color3(0.2, 0.2, 1), 2); // Blue
-    this.createBox(new Vector3(5, 1, -5), new Color3(1, 1, 0.2), 2); // Yellow
-    this.createBox(new Vector3(-5, 1, -5), new Color3(1, 0.2, 1), 2); // Magenta
-
-    // Create a tall tower
-    this.createBox(new Vector3(10, 2.5, 0), new Color3(0.8, 0.8, 0.8), 5, 1, 1);
-
-    // Create some spheres
-    this.createSphere(new Vector3(0, 1.5, 8), new Color3(1, 0.5, 0));
-    this.createSphere(new Vector3(-8, 1.5, -8), new Color3(0.5, 0, 1));
-
-    // Create a platform
-    const platform = MeshBuilder.CreateBox(
-      'platform',
-      { width: 8, height: 0.5, depth: 8 },
-      this.scene
-    );
-    platform.position = new Vector3(0, 3, -10);
-    const platformMat = new StandardMaterial('platformMat', this.scene);
-    platformMat.diffuseColor = new Color3(0.6, 0.4, 0.2);
-    platform.material = platformMat;
-    platform.checkCollisions = true;
-  }
-
-  private createBox(
-    position: Vector3,
-    color: Color3,
-    height: number = 2,
-    width: number = 2,
-    depth: number = 2
-  ): void {
-    const box = MeshBuilder.CreateBox(
-      'box',
-      { width, height, depth },
-      this.scene
-    );
-    box.position = position;
-
-    const material = new StandardMaterial('boxMat', this.scene);
-    material.diffuseColor = color;
-    material.specularColor = new Color3(0.2, 0.2, 0.2);
-    box.material = material;
-    box.checkCollisions = true;
-  }
-
-  private createSphere(position: Vector3, color: Color3): void {
-    const sphere = MeshBuilder.CreateSphere(
-      'sphere',
-      { diameter: 2 },
-      this.scene
-    );
-    sphere.position = position;
-
-    const material = new StandardMaterial('sphereMat', this.scene);
-    material.diffuseColor = color;
-    material.specularColor = new Color3(0.5, 0.5, 0.5);
-    sphere.material = material;
-    sphere.checkCollisions = true;
-
-    // Animate sphere (float up and down)
-    let time = 0;
-    this.scene.registerBeforeRender(() => {
-      time += 0.02;
-      sphere.position.y = position.y + Math.sin(time) * 0.5;
+    worldGen.generateWorld({
+      mapSize: 100,
+      numHouses: 18,
+      numTrees: 35,
+      numPowerPoles: 12,
     });
+
+    console.log('🏠 Generated', worldGen.getHouses().length, 'houses');
+    console.log('🌲 Generated', worldGen.getTrees().length, 'trees');
   }
 
   public update(): void {
