@@ -67,33 +67,40 @@ export class SceneManager {
       return;
     }
 
-    // FollowCamera for third-person view
-    this.camera = new FollowCamera(
-      'followCam',
-      new Vector3(0, 5, -10),
+    // ArcRotateCamera for better mobile control
+    const playerPos = this.player.getPosition();
+    this.camera = new ArcRotateCamera(
+      'camera',
+      -Math.PI / 2, // Alpha (horizontal rotation) - behind player
+      Math.PI / 3,  // Beta (vertical angle)
+      12,           // Radius (distance from target)
+      playerPos,    // Target the player position
       this.scene
     );
 
-    // Follow the player
+    // Mobile-friendly camera settings
+    this.camera.attachControl(this.scene.getEngine().getRenderingCanvas(), true);
+
+    // Touch gestures
+    this.camera.pinchPrecision = 50;
+    this.camera.panningSensibility = 1000;
+    this.camera.angularSensibilityX = 1000;
+    this.camera.angularSensibilityY = 1000;
+
+    // Camera limits
+    this.camera.lowerRadiusLimit = 5;
+    this.camera.upperRadiusLimit = 25;
+    this.camera.lowerBetaLimit = 0.1;
+    this.camera.upperBetaLimit = Math.PI / 2.2;
+
+    // Smooth movement
+    this.camera.inertia = 0.8;
+    this.camera.wheelPrecision = 20;
+
+    // Update camera target to follow player
     this.camera.lockedTarget = this.player.getMesh();
 
-    // Camera positioning
-    this.camera.radius = 12; // Distance from player
-    this.camera.heightOffset = 6; // Height above player (increased to stay above ground)
-    this.camera.rotationOffset = 0; // Rotation around player (0 = behind)
-
-    // Camera movement settings
-    this.camera.cameraAcceleration = 0.05; // How quickly camera catches up
-    this.camera.maxCameraSpeed = 10; // Maximum camera speed
-
-    // Prevent camera from going below ground
-    this.camera.lowerHeightOffsetLimit = 2; // Minimum 2 units above player
-    this.camera.upperHeightOffsetLimit = 20; // Maximum 20 units above player
-
-    // DON'T attach controls - we only want camera to follow, not respond to touch
-    // this.camera.attachControl(true);
-
-    console.log('📷 Follow camera created (auto-follow only, no manual controls)');
+    console.log('📷 ArcRotate camera created with touch controls');
   }
 
   private createLighting(): void {

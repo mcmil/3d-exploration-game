@@ -16,30 +16,30 @@ export class VirtualJoystick {
     this.scene = scene;
     // Outer circle (joystick base) - LARGER and MORE VISIBLE
     this.outerCircle = new Ellipse();
-    this.outerCircle.width = '200px'; // Increased from 150px
+    this.outerCircle.width = '200px';
     this.outerCircle.height = '200px';
     this.outerCircle.color = 'white';
-    this.outerCircle.thickness = 6; // Thicker border (was 4)
-    this.outerCircle.alpha = 0.7; // More visible (was 0.4)
-    this.outerCircle.background = 'rgba(255, 255, 255, 0.1)'; // Slight fill
+    this.outerCircle.thickness = 6;
+    this.outerCircle.alpha = 0.7;
+    this.outerCircle.background = 'rgba(255, 255, 255, 0.1)';
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.left = 100; // Adjusted for larger size
-    this.outerCircle.top = -100;
+    this.outerCircle.left = '100px';
+    this.outerCircle.top = '-100px';
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - LARGER and MORE VISIBLE
     this.innerCircle = new Ellipse();
-    this.innerCircle.width = '100px'; // Increased from 75px
+    this.innerCircle.width = '100px';
     this.innerCircle.height = '100px';
     this.innerCircle.color = 'white';
-    this.innerCircle.thickness = 6; // Thicker border (was 4)
-    this.innerCircle.background = 'rgba(255, 255, 255, 0.5)'; // More visible (was 0.3)
-    this.innerCircle.alpha = 0.9; // More visible (was 0.6)
+    this.innerCircle.thickness = 6;
+    this.innerCircle.background = 'rgba(255, 255, 255, 0.5)';
+    this.innerCircle.alpha = 0.9;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.left = 100; // Adjusted for larger size
-    this.innerCircle.top = -100;
+    this.innerCircle.left = '100px'; // Same as outer to center
+    this.innerCircle.top = '-100px'; // Same as outer to center
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -60,16 +60,24 @@ export class VirtualJoystick {
         Math.pow(pointerY - screenCenterY, 2)
       );
 
+      // If touch is in joystick area, prevent default camera behavior
+      const inJoystickArea = distanceFromCenter < 120;
+
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
           // Only activate if touching in joystick area (within 120px of center)
-          if (distanceFromCenter < 120) {
+          if (inJoystickArea) {
             this.isActive = true;
+            // Prevent camera from handling this event
+            pointerInfo.event.preventDefault();
           }
           break;
 
         case PointerEventTypes.POINTERMOVE:
           if (!this.isActive) return;
+
+          // Prevent camera from handling this event
+          pointerInfo.event.preventDefault();
 
           // Calculate offset from center
           const deltaX = pointerX - screenCenterX;
@@ -87,9 +95,9 @@ export class VirtualJoystick {
             thumbDeltaY = Math.sin(angle) * maxDist;
           }
 
-          // Update thumb position
-          this.innerCircle.left = 100 + thumbDeltaX;
-          this.innerCircle.top = -(100 - thumbDeltaY);
+          // Update thumb position (convert to pixel string)
+          this.innerCircle.left = `${100 + thumbDeltaX}px`;
+          this.innerCircle.top = `${-(100 - thumbDeltaY)}px`;
 
           // Calculate normalized direction
           this.direction.x = thumbDeltaX / maxDist;
@@ -105,9 +113,12 @@ export class VirtualJoystick {
 
           this.isActive = false;
 
+          // Prevent camera from handling this event
+          pointerInfo.event.preventDefault();
+
           // Reset thumb to center
-          this.innerCircle.left = 100;
-          this.innerCircle.top = -100;
+          this.innerCircle.left = '100px';
+          this.innerCircle.top = '-100px';
 
           // Clear direction
           this.direction = Vector2.Zero();
