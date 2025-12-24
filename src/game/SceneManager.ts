@@ -18,6 +18,10 @@ export class SceneManager {
   private scene: Scene;
   private camera: ArcRotateCamera | null = null;
   private player: PlayerController | null = null;
+  // Default camera angles for isometric view
+  public readonly defaultAlpha: number = -Math.PI / 4; // 45 degrees from side
+  public readonly defaultBeta: number = Math.PI / 3.5; // ~51 degrees from top (isometric-ish)
+  public readonly defaultRadius: number = 30; // Distance from player
 
   constructor(engine: Engine) {
     this.scene = new Scene(engine);
@@ -66,40 +70,33 @@ export class SceneManager {
       return;
     }
 
-    // ArcRotateCamera for better mobile control
+    // Isometric-style overhead camera
     const playerPos = this.player.getPosition();
     this.camera = new ArcRotateCamera(
       'camera',
-      -Math.PI / 2, // Alpha (horizontal rotation) - behind player
-      Math.PI / 3,  // Beta (vertical angle)
-      20,           // Radius (distance from target) - zoomed out more
-      playerPos,    // Target the player position
+      this.defaultAlpha,  // Angled from side for isometric feel
+      this.defaultBeta,   // Looking down at ~51 degrees (isometric-ish)
+      this.defaultRadius, // Zoomed out to see neighborhood
+      playerPos,          // Target the player position
       this.scene
     );
 
-    // Mobile-friendly camera settings
-    this.camera.attachControl(this.scene.getEngine().getRenderingCanvas(), true);
+    // Don't attach default controls - we'll handle manually with joystick
+    // this.camera.attachControl(...) is intentionally not called
 
-    // More responsive touch gestures for mobile
-    this.camera.pinchPrecision = 100; // More sensitive zoom
-    this.camera.panningSensibility = 500; // More responsive panning
-    this.camera.angularSensibilityX = 500; // More responsive rotation
-    this.camera.angularSensibilityY = 500;
+    // Camera limits for when manually controlled
+    this.camera.lowerRadiusLimit = 20;
+    this.camera.upperRadiusLimit = 50;
+    this.camera.lowerBetaLimit = 0.3;
+    this.camera.upperBetaLimit = Math.PI / 2.5;
 
-    // Camera limits
-    this.camera.lowerRadiusLimit = 5;
-    this.camera.upperRadiusLimit = 25;
-    this.camera.lowerBetaLimit = 0.1;
-    this.camera.upperBetaLimit = Math.PI / 2.2;
+    // Smooth camera movement
+    this.camera.inertia = 0.85;
 
-    // Smoother movement
-    this.camera.inertia = 0.9;
-    this.camera.wheelPrecision = 20;
-
-    // Update camera target to follow player
+    // Keep camera locked to follow player
     this.camera.lockedTarget = this.player.getMesh();
 
-    console.log('📷 ArcRotate camera created with touch controls');
+    console.log('📷 Isometric overhead camera created');
   }
 
   private createLighting(): void {

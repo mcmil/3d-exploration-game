@@ -61,17 +61,33 @@ export class GameEngine {
           player.move(direction);
         }
 
-        // Update camera rotation based on camera joystick
+        // Update camera rotation based on camera joystick with snap-back
         const camera = this.sceneManager.getCamera();
         if (camera && this.joystick) {
           const cameraRotation = this.joystick.getCameraRotation();
           const deltaTime = this.engine.getDeltaTime() / 1000;
+          const length = cameraRotation.length();
 
-          // Rotate camera horizontally (alpha) - extremely fast
-          camera.alpha += cameraRotation.x * deltaTime * 7;
+          if (length > 0.01) {
+            // Camera joystick is being used - rotate camera
+            camera.alpha += cameraRotation.x * deltaTime * 7;
+            camera.beta -= cameraRotation.y * deltaTime * 7;
+          } else {
+            // Camera joystick released - snap back to default isometric view
+            const snapSpeed = 3.0; // Speed of snap-back
 
-          // Rotate camera vertically (beta) - extremely fast
-          camera.beta -= cameraRotation.y * deltaTime * 7;
+            // Lerp alpha back to default
+            const alphaDiff = this.sceneManager.defaultAlpha - camera.alpha;
+            camera.alpha += alphaDiff * snapSpeed * deltaTime;
+
+            // Lerp beta back to default
+            const betaDiff = this.sceneManager.defaultBeta - camera.beta;
+            camera.beta += betaDiff * snapSpeed * deltaTime;
+
+            // Lerp radius back to default
+            const radiusDiff = this.sceneManager.defaultRadius - camera.radius;
+            camera.radius += radiusDiff * snapSpeed * deltaTime;
+          }
         }
 
         this.sceneManager.update();
@@ -79,7 +95,7 @@ export class GameEngine {
     });
 
     console.log('🎮 Game engine initialized!');
-    console.log('🕹️  Red joystick (left) - movement, Green joystick (right) - camera');
+    console.log('🕹️  Red joystick (left) - movement, Green joystick (right) - camera (snaps back)');
   }
 
   public getScene(): Scene | null {

@@ -128,28 +128,22 @@ export class PlayerController {
 
     const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
-    // Get current player rotation
-    const playerRotation = this.playerMesh.rotation.y;
-
-    // Rotate input direction by player's facing direction
-    // direction.y (forward on joystick) should move in the direction player is facing
-    // direction.x (strafe on joystick) should move perpendicular to facing
-    const rotatedX = direction.x * Math.cos(playerRotation) - direction.y * Math.sin(playerRotation);
-    const rotatedZ = direction.x * Math.sin(playerRotation) + direction.y * Math.cos(playerRotation);
-
+    // Absolute world movement for isometric view
+    // Joystick X = world X (left/right)
+    // Joystick Y = world Z (forward/back)
     const moveDirection = new Vector3(
-      rotatedX * this.moveSpeed,
+      direction.x * this.moveSpeed,
       0,
-      rotatedZ * this.moveSpeed
+      direction.y * this.moveSpeed
     );
 
     // Apply movement
     this.playerMesh.position.x += moveDirection.x * deltaTime;
     this.playerMesh.position.z += moveDirection.z * deltaTime;
 
-    // Rotate player to face movement direction (only if moving)
+    // Rotate player to face movement direction
     if (length > 0.1) {
-      const targetRotation = Math.atan2(rotatedX, rotatedZ);
+      const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
       const currentRotation = this.playerMesh.rotation.y;
 
       // Smooth rotation
