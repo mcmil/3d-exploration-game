@@ -11,9 +11,7 @@ import {
   SceneOptimizerOptions,
   ParticleSystem,
   Texture,
-  CannonJSPlugin,
 } from '@babylonjs/core';
-import * as CANNON from 'cannon-es';
 import { WorldGenerator } from './WorldGenerator';
 import { PlayerController } from './PlayerController';
 
@@ -34,16 +32,8 @@ export class SceneManager {
     // Enable collision detection
     this.scene.collisionsEnabled = true;
 
-    try {
-      // Initialize physics with Cannon.js
-      const gravityVector = new Vector3(0, -9.81, 0);
-      const physicsPlugin = new CannonJSPlugin(true, 10, CANNON);
-      this.scene.enablePhysics(gravityVector, physicsPlugin);
-      console.log('⚙️ Physics engine initialized (Cannon.js)');
-    } catch (error) {
-      console.error('❌ Failed to initialize physics:', error);
-      console.log('⚠️ Continuing without physics...');
-    }
+    // Physics disabled for now - will add back with correct version later
+    console.log('⚙️ Running without physics (will add later with correct version)');
 
     // Configure scene optimizer for automatic quality adjustment
     const options = SceneOptimizerOptions.ModerateDegradationAllowed();
@@ -89,17 +79,21 @@ export class SceneManager {
 
     // Camera positioning
     this.camera.radius = 12; // Distance from player
-    this.camera.heightOffset = 4; // Height above player
+    this.camera.heightOffset = 6; // Height above player (increased to stay above ground)
     this.camera.rotationOffset = 0; // Rotation around player (0 = behind)
 
     // Camera movement settings
     this.camera.cameraAcceleration = 0.05; // How quickly camera catches up
     this.camera.maxCameraSpeed = 10; // Maximum camera speed
 
+    // Prevent camera from going below ground
+    this.camera.lowerHeightOffsetLimit = 2; // Minimum 2 units above player
+    this.camera.upperHeightOffsetLimit = 20; // Maximum 20 units above player
+
     // Attach controls (FollowCamera only takes one parameter)
     this.camera.attachControl(true);
 
-    console.log('📷 Follow camera created');
+    console.log('📷 Follow camera created with ground protection');
   }
 
   private createLighting(): void {

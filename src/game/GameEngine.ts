@@ -51,7 +51,8 @@ export class GameEngine {
 
     // Create GUI and virtual joystick
     const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
-    this.joystick = new VirtualJoystick(advancedTexture);
+    const scene = this.sceneManager.getScene();
+    this.joystick = new VirtualJoystick(advancedTexture, scene);
 
     // Start render loop
     this.engine.runRenderLoop(() => {
@@ -68,7 +69,7 @@ export class GameEngine {
     });
 
     console.log('🎮 Game engine initialized!');
-    console.log('🕹️  Virtual joystick ready (bottom-left)');
+    console.log('🕹️  Virtual joystick ready - touch bottom-left corner to move');
   }
 
   public getScene(): Scene | null {

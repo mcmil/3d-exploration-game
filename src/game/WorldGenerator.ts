@@ -5,8 +5,6 @@ import {
   MeshBuilder,
   StandardMaterial,
   Color3,
-  PhysicsAggregate,
-  PhysicsShapeType,
 } from '@babylonjs/core';
 import { HouseBuilder, HouseConfig } from '../models/HouseBuilder';
 import { TreeBuilder } from '../models/TreeBuilder';
@@ -98,21 +96,6 @@ export class WorldGenerator {
       }
       ground.updateVerticesData('position', positions);
       ground.createNormals(true);
-    }
-
-    // Add physics to ground if physics is enabled
-    if (this.scene.isPhysicsEnabled()) {
-      try {
-        new PhysicsAggregate(
-          ground,
-          PhysicsShapeType.MESH,
-          { mass: 0, restitution: 0.2, friction: 0.8 },
-          this.scene
-        );
-        console.log('🌍 Ground physics initialized');
-      } catch (error) {
-        console.error('❌ Failed to add ground physics:', error);
-      }
     }
   }
 

@@ -5,15 +5,12 @@ import {
   StandardMaterial,
   Color3,
   Vector3,
-  PhysicsAggregate,
-  PhysicsShapeType,
   Vector2,
 } from '@babylonjs/core';
 
 export class PlayerController {
   private scene: Scene;
   private playerMesh: Mesh | null = null;
-  private physicsAggregate: PhysicsAggregate | null = null;
   private moveSpeed: number = 5.0;
   private rotationSpeed: number = 0.1;
 
@@ -40,62 +37,24 @@ export class PlayerController {
     playerMat.emissiveColor = new Color3(0.3, 0.15, 0);
     this.playerMesh.material = playerMat;
 
-    // Add physics if available
-    if (this.scene.isPhysicsEnabled()) {
-      try {
-        this.physicsAggregate = new PhysicsAggregate(
-          this.playerMesh,
-          PhysicsShapeType.CAPSULE,
-          { mass: 1, restitution: 0.2, friction: 0.5 },
-          this.scene
-        );
-
-        // Lock rotation so player doesn't tip over
-        this.physicsAggregate.body.setAngularDamping(0.99);
-        this.physicsAggregate.body.setLinearDamping(0.5);
-        console.log('🚶 Player created with physics');
-      } catch (error) {
-        console.error('❌ Failed to add player physics:', error);
-        console.log('🚶 Player created without physics');
-      }
-    } else {
-      console.log('🚶 Player created without physics');
-    }
+    console.log('🚶 Player created at spawn point');
   }
 
   public move(direction: Vector2): void {
     if (!this.playerMesh) return;
-
-    if (direction.length() === 0) {
-      if (this.physicsAggregate) {
-        // Stop movement when joystick released (with physics)
-        const velocity = this.physicsAggregate.body.getLinearVelocity();
-        this.physicsAggregate.body.setLinearVelocity(
-          new Vector3(0, velocity.y, 0)
-        );
-      }
-      return;
-    }
+    if (direction.length() === 0) return;
 
     // Calculate movement direction (relative to world, not camera)
+    const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
     const moveDirection = new Vector3(
       direction.x * this.moveSpeed,
       0,
       direction.y * this.moveSpeed
     );
 
-    if (this.physicsAggregate) {
-      // Apply velocity with physics
-      const currentVelocity = this.physicsAggregate.body.getLinearVelocity();
-      this.physicsAggregate.body.setLinearVelocity(
-        new Vector3(moveDirection.x, currentVelocity.y, moveDirection.z)
-      );
-    } else {
-      // Simple position-based movement without physics
-      const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
-      this.playerMesh.position.x += moveDirection.x * deltaTime;
-      this.playerMesh.position.z += moveDirection.z * deltaTime;
-    }
+    // Simple position-based movement
+    this.playerMesh.position.x += moveDirection.x * deltaTime;
+    this.playerMesh.position.z += moveDirection.z * deltaTime;
 
     // Rotate player to face movement direction
     if (moveDirection.length() > 0.1) {
