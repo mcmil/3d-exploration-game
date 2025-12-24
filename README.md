@@ -1,12 +1,17 @@
 # 🎮 3D Exploration Game
 
-A mobile-first 3D browser game built with Babylon.js, TypeScript, and Vite.
+A mobile-first 3D browser game built with Babylon.js, developed entirely through Claude Code on mobile.
 
 ## 🚀 Live Demo
 
+**URL**: `https://[your-username].github.io/3d-exploration-game/`
+
 The game is automatically deployed to GitHub Pages on every push!
 
-**URL**: `https://[your-username].github.io/3d-exploration-game/`
+## 📖 Documentation
+
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Complete development guide, architecture, and roadmap
+- **README.md** (this file) - Quick start and overview
 
 ## ✨ Features
 
@@ -110,27 +115,12 @@ npm run build
 
 ## 🎯 Next Steps
 
-This is a basic starter template. Here are some ideas to expand the game:
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for the complete roadmap.
 
-### Immediate Enhancements:
-- [ ] Add virtual joystick for movement
-- [ ] Implement player character with physics
-- [ ] Add collision detection and interaction
-- [ ] Create more detailed environment
-
-### Advanced Features:
-- [ ] Add sound effects and music
-- [ ] Implement inventory system
-- [ ] Create objectives/missions
-- [ ] Add particle effects
-- [ ] Implement save/load system
-- [ ] Add multiplayer support
-
-### Performance:
-- [ ] Implement LOD (Level of Detail) system
-- [ ] Add texture compression (KTX2)
-- [ ] Optimize shadow rendering
-- [ ] Implement object pooling
+**Phase 1 (Next)**: Player movement with virtual joystick
+**Phase 2**: Enhanced environment and collectibles
+**Phase 3**: Interactions and gameplay mechanics
+**Phase 4**: Advanced features and polish
 
 ## 📚 Resources
 
