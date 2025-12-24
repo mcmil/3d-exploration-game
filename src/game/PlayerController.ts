@@ -32,7 +32,7 @@ export class PlayerController {
       this.scene
     );
 
-    this.playerMesh.position = new Vector3(0, 3, -5);
+    this.playerMesh.position = new Vector3(0, 1, -5);
 
     // Player material (bright orange for visibility)
     const playerMat = new StandardMaterial('playerMat', this.scene);
@@ -40,30 +40,40 @@ export class PlayerController {
     playerMat.emissiveColor = new Color3(0.3, 0.15, 0);
     this.playerMesh.material = playerMat;
 
-    // Add physics
-    this.physicsAggregate = new PhysicsAggregate(
-      this.playerMesh,
-      PhysicsShapeType.CAPSULE,
-      { mass: 1, restitution: 0.2, friction: 0.5 },
-      this.scene
-    );
+    // Add physics if available
+    if (this.scene.isPhysicsEnabled()) {
+      try {
+        this.physicsAggregate = new PhysicsAggregate(
+          this.playerMesh,
+          PhysicsShapeType.CAPSULE,
+          { mass: 1, restitution: 0.2, friction: 0.5 },
+          this.scene
+        );
 
-    // Lock rotation so player doesn't tip over
-    this.physicsAggregate.body.setAngularDamping(0.99);
-    this.physicsAggregate.body.setLinearDamping(0.5);
-
-    console.log('🚶 Player created at spawn point');
+        // Lock rotation so player doesn't tip over
+        this.physicsAggregate.body.setAngularDamping(0.99);
+        this.physicsAggregate.body.setLinearDamping(0.5);
+        console.log('🚶 Player created with physics');
+      } catch (error) {
+        console.error('❌ Failed to add player physics:', error);
+        console.log('🚶 Player created without physics');
+      }
+    } else {
+      console.log('🚶 Player created without physics');
+    }
   }
 
   public move(direction: Vector2): void {
-    if (!this.playerMesh || !this.physicsAggregate) return;
+    if (!this.playerMesh) return;
 
     if (direction.length() === 0) {
-      // Stop movement when joystick released
-      const velocity = this.physicsAggregate.body.getLinearVelocity();
-      this.physicsAggregate.body.setLinearVelocity(
-        new Vector3(0, velocity.y, 0)
-      );
+      if (this.physicsAggregate) {
+        // Stop movement when joystick released (with physics)
+        const velocity = this.physicsAggregate.body.getLinearVelocity();
+        this.physicsAggregate.body.setLinearVelocity(
+          new Vector3(0, velocity.y, 0)
+        );
+      }
       return;
     }
 
@@ -74,11 +84,18 @@ export class PlayerController {
       direction.y * this.moveSpeed
     );
 
-    // Apply velocity
-    const currentVelocity = this.physicsAggregate.body.getLinearVelocity();
-    this.physicsAggregate.body.setLinearVelocity(
-      new Vector3(moveDirection.x, currentVelocity.y, moveDirection.z)
-    );
+    if (this.physicsAggregate) {
+      // Apply velocity with physics
+      const currentVelocity = this.physicsAggregate.body.getLinearVelocity();
+      this.physicsAggregate.body.setLinearVelocity(
+        new Vector3(moveDirection.x, currentVelocity.y, moveDirection.z)
+      );
+    } else {
+      // Simple position-based movement without physics
+      const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
+      this.playerMesh.position.x += moveDirection.x * deltaTime;
+      this.playerMesh.position.z += moveDirection.z * deltaTime;
+    }
 
     // Rotate player to face movement direction
     if (moveDirection.length() > 0.1) {

@@ -100,15 +100,20 @@ export class WorldGenerator {
       ground.createNormals(true);
     }
 
-    // Add physics to ground (static body with no mass)
-    new PhysicsAggregate(
-      ground,
-      PhysicsShapeType.MESH,
-      { mass: 0, restitution: 0.2, friction: 0.8 },
-      this.scene
-    );
-
-    console.log('🌍 Ground physics initialized');
+    // Add physics to ground if physics is enabled
+    if (this.scene.isPhysicsEnabled()) {
+      try {
+        new PhysicsAggregate(
+          ground,
+          PhysicsShapeType.MESH,
+          { mass: 0, restitution: 0.2, friction: 0.8 },
+          this.scene
+        );
+        console.log('🌍 Ground physics initialized');
+      } catch (error) {
+        console.error('❌ Failed to add ground physics:', error);
+      }
+    }
   }
 
   private generateHouses(numHouses: number, mapSize: number): void {

@@ -34,16 +34,20 @@ export class SceneManager {
     // Enable collision detection
     this.scene.collisionsEnabled = true;
 
-    // Initialize physics with Cannon.js
-    const gravityVector = new Vector3(0, -9.81, 0);
-    const physicsPlugin = new CannonJSPlugin(true, 10, CANNON);
-    this.scene.enablePhysics(gravityVector, physicsPlugin);
+    try {
+      // Initialize physics with Cannon.js
+      const gravityVector = new Vector3(0, -9.81, 0);
+      const physicsPlugin = new CannonJSPlugin(true, 10, CANNON);
+      this.scene.enablePhysics(gravityVector, physicsPlugin);
+      console.log('⚙️ Physics engine initialized (Cannon.js)');
+    } catch (error) {
+      console.error('❌ Failed to initialize physics:', error);
+      console.log('⚠️ Continuing without physics...');
+    }
 
     // Configure scene optimizer for automatic quality adjustment
     const options = SceneOptimizerOptions.ModerateDegradationAllowed();
     SceneOptimizer.OptimizeAsync(this.scene, options);
-
-    console.log('⚙️ Physics engine initialized (Cannon.js)');
   }
 
   public async createScene(): Promise<void> {
