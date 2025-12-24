@@ -115,7 +115,7 @@ export class SceneManager {
   }
 
   private createFallingSnow(): void {
-    const particleSystem = new ParticleSystem('snow', 2500, this.scene);
+    const particleSystem = new ParticleSystem('snow', 5000, this.scene);
 
     // Use a simple white texture
     particleSystem.particleTexture = new Texture(
@@ -128,19 +128,19 @@ export class SceneManager {
     particleSystem.minEmitBox = new Vector3(-120, 0, -120);
     particleSystem.maxEmitBox = new Vector3(120, 0, 120);
 
-    // Opaque white particles - very visible
+    // Bright opaque white particles with slight glow
     particleSystem.color1 = new Color4(1, 1, 1, 1);
-    particleSystem.color2 = new Color4(1, 1, 1, 1);
-    particleSystem.colorDead = new Color4(1, 1, 1, 0.2);
+    particleSystem.color2 = new Color4(0.95, 0.98, 1, 1); // Slight blue tint
+    particleSystem.colorDead = new Color4(1, 1, 1, 0.3);
 
-    // Medium-sized snowflakes
-    particleSystem.minSize = 0.5;
-    particleSystem.maxSize = 1.0;
+    // MUCH LARGER snowflakes - highly visible
+    particleSystem.minSize = 1.5;
+    particleSystem.maxSize = 3.0;
 
     particleSystem.minLifeTime = 18;
     particleSystem.maxLifeTime = 28;
 
-    particleSystem.emitRate = 120;
+    particleSystem.emitRate = 200; // More snow
 
     // Gentle falling with drift
     particleSystem.direction1 = new Vector3(-1, -3, -0.5);

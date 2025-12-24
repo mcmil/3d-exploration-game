@@ -141,8 +141,8 @@ export class WorldGenerator {
         if (attempts > 100) break; // Prevent infinite loop
       } while (
         Math.sqrt(x * x + z * z) < 10 || // At least 10 units from spawn
-        (Math.abs(x) < 4 && Math.abs(z) < mapSize / 2) || // Not on vertical road
-        (Math.abs(z) < 4 && Math.abs(x) < mapSize / 2)    // Not on horizontal road
+        Math.abs(x) < 4 ||  // Not on vertical road (north-south along x=0)
+        Math.abs(z) < 4     // Not on horizontal road (east-west along z=0)
       );
 
       const height = 4 + Math.random() * 3; // Random height 4-7
