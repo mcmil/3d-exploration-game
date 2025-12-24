@@ -14,32 +14,32 @@ export class VirtualJoystick {
 
   constructor(advancedTexture: AdvancedDynamicTexture, scene: Scene) {
     this.scene = scene;
-    // Outer circle (joystick base) - LARGER and MORE VISIBLE
+    // Outer circle (joystick base) - MUCH LARGER and HIGHLY VISIBLE
     this.outerCircle = new Ellipse();
-    this.outerCircle.width = '200px';
-    this.outerCircle.height = '200px';
-    this.outerCircle.color = 'white';
-    this.outerCircle.thickness = 6;
-    this.outerCircle.alpha = 0.7;
-    this.outerCircle.background = 'rgba(255, 255, 255, 0.1)';
+    this.outerCircle.width = '280px'; // Much larger (was 200px)
+    this.outerCircle.height = '280px';
+    this.outerCircle.color = '#00FFFF'; // Cyan color for high visibility
+    this.outerCircle.thickness = 8; // Thicker border
+    this.outerCircle.alpha = 0.9; // Very visible
+    this.outerCircle.background = 'rgba(0, 255, 255, 0.2)'; // Cyan tint
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.left = '100px';
-    this.outerCircle.top = '-100px';
+    this.outerCircle.left = '140px'; // Adjusted for larger size
+    this.outerCircle.top = '-140px';
     advancedTexture.addControl(this.outerCircle);
 
-    // Inner circle (joystick thumb) - LARGER and MORE VISIBLE
+    // Inner circle (joystick thumb) - MUCH LARGER and HIGHLY VISIBLE
     this.innerCircle = new Ellipse();
-    this.innerCircle.width = '100px';
-    this.innerCircle.height = '100px';
-    this.innerCircle.color = 'white';
-    this.innerCircle.thickness = 6;
-    this.innerCircle.background = 'rgba(255, 255, 255, 0.5)';
-    this.innerCircle.alpha = 0.9;
+    this.innerCircle.width = '140px'; // Much larger (was 100px)
+    this.innerCircle.height = '140px';
+    this.innerCircle.color = '#FF00FF'; // Magenta color for contrast
+    this.innerCircle.thickness = 8; // Thicker border
+    this.innerCircle.background = 'rgba(255, 0, 255, 0.6)'; // Magenta fill
+    this.innerCircle.alpha = 1.0; // Fully visible
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.left = '100px'; // Same as outer to center
-    this.innerCircle.top = '-100px'; // Same as outer to center
+    this.innerCircle.left = '140px'; // Same as outer to center
+    this.innerCircle.top = '-140px'; // Same as outer to center
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -51,9 +51,9 @@ export class VirtualJoystick {
       const pointerX = pointerInfo.event.clientX;
       const pointerY = pointerInfo.event.clientY;
 
-      // Joystick center is at 100px from left, 100px from bottom (updated)
-      const screenCenterX = 100;
-      const screenCenterY = window.innerHeight - 100;
+      // Joystick center is at 140px from left, 140px from bottom
+      const screenCenterX = 140;
+      const screenCenterY = window.innerHeight - 140;
 
       const distanceFromCenter = Math.sqrt(
         Math.pow(pointerX - screenCenterX, 2) +
@@ -61,7 +61,7 @@ export class VirtualJoystick {
       );
 
       // If touch is in joystick area, prevent default camera behavior
-      const inJoystickArea = distanceFromCenter < 120;
+      const inJoystickArea = distanceFromCenter < 160; // Larger detection area
 
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
@@ -83,8 +83,8 @@ export class VirtualJoystick {
           const deltaX = pointerX - screenCenterX;
           const deltaY = pointerY - screenCenterY;
 
-          // Clamp to max distance (increased to 75 for larger joystick)
-          const maxDist = 75;
+          // Clamp to max distance (larger for bigger joystick)
+          const maxDist = 100; // Increased from 75
           const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
           let thumbDeltaX = deltaX;
           let thumbDeltaY = deltaY;
@@ -96,8 +96,8 @@ export class VirtualJoystick {
           }
 
           // Update thumb position (convert to pixel string)
-          this.innerCircle.left = `${100 + thumbDeltaX}px`;
-          this.innerCircle.top = `${-(100 - thumbDeltaY)}px`;
+          this.innerCircle.left = `${140 + thumbDeltaX}px`;
+          this.innerCircle.top = `${-(140 - thumbDeltaY)}px`;
 
           // Calculate normalized direction
           this.direction.x = thumbDeltaX / maxDist;
@@ -117,8 +117,8 @@ export class VirtualJoystick {
           pointerInfo.event.preventDefault();
 
           // Reset thumb to center
-          this.innerCircle.left = '100px';
-          this.innerCircle.top = '-100px';
+          this.innerCircle.left = '140px';
+          this.innerCircle.top = '-140px';
 
           // Clear direction
           this.direction = Vector2.Zero();

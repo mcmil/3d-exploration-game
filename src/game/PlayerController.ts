@@ -37,7 +37,73 @@ export class PlayerController {
     playerMat.emissiveColor = new Color3(0.3, 0.15, 0);
     this.playerMesh.material = playerMat;
 
-    console.log('🚶 Player created at spawn point');
+    // Add directional indicators
+
+    // Hat on top (cone pointing up)
+    const hat = MeshBuilder.CreateCylinder(
+      'hat',
+      {
+        diameterTop: 0,
+        diameterBottom: 0.6,
+        height: 0.4,
+      },
+      this.scene
+    );
+    hat.position.y = 1.2; // On top of capsule
+    hat.parent = this.playerMesh;
+
+    const hatMat = new StandardMaterial('hatMat', this.scene);
+    hatMat.diffuseColor = new Color3(1, 0, 0); // Red hat
+    hatMat.emissiveColor = new Color3(0.3, 0, 0);
+    hat.material = hatMat;
+
+    // Eyes (two spheres) - positioned at the front
+    const eyeMat = new StandardMaterial('eyeMat', this.scene);
+    eyeMat.diffuseColor = new Color3(1, 1, 1); // White
+    eyeMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
+
+    const leftEye = MeshBuilder.CreateSphere(
+      'leftEye',
+      { diameter: 0.15 },
+      this.scene
+    );
+    leftEye.position.set(-0.15, 0.3, 0.45); // Left side, front
+    leftEye.parent = this.playerMesh;
+    leftEye.material = eyeMat;
+
+    const rightEye = MeshBuilder.CreateSphere(
+      'rightEye',
+      { diameter: 0.15 },
+      this.scene
+    );
+    rightEye.position.set(0.15, 0.3, 0.45); // Right side, front
+    rightEye.parent = this.playerMesh;
+    rightEye.material = eyeMat;
+
+    // Pupils (smaller black spheres)
+    const pupilMat = new StandardMaterial('pupilMat', this.scene);
+    pupilMat.diffuseColor = new Color3(0, 0, 0);
+    pupilMat.emissiveColor = new Color3(0, 0, 0);
+
+    const leftPupil = MeshBuilder.CreateSphere(
+      'leftPupil',
+      { diameter: 0.08 },
+      this.scene
+    );
+    leftPupil.position.set(-0.15, 0.3, 0.52); // In front of eye
+    leftPupil.parent = this.playerMesh;
+    leftPupil.material = pupilMat;
+
+    const rightPupil = MeshBuilder.CreateSphere(
+      'rightPupil',
+      { diameter: 0.08 },
+      this.scene
+    );
+    rightPupil.position.set(0.15, 0.3, 0.52); // In front of eye
+    rightPupil.parent = this.playerMesh;
+    rightPupil.material = pupilMat;
+
+    console.log('🚶 Player created at spawn point with directional indicators');
   }
 
   public move(direction: Vector2): void {
