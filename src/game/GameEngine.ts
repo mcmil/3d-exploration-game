@@ -1,5 +1,4 @@
 import { Engine, Scene } from '@babylonjs/core';
-import { AdvancedDynamicTexture } from '@babylonjs/gui';
 import { SceneManager } from './SceneManager';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 
@@ -49,10 +48,8 @@ export class GameEngine {
     this.sceneManager = new SceneManager(this.engine);
     await this.sceneManager.createScene();
 
-    // Create GUI and virtual joystick
-    const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
-    const scene = this.sceneManager.getScene();
-    this.joystick = new VirtualJoystick(advancedTexture, scene);
+    // Create virtual joystick (uses Babylon.js built-in)
+    this.joystick = new VirtualJoystick();
 
     // Start render loop
     this.engine.runRenderLoop(() => {
