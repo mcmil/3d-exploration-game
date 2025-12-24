@@ -42,7 +42,9 @@ export class PlayerController {
 
   public move(direction: Vector2): void {
     if (!this.playerMesh) return;
-    if (direction.length() === 0) return;
+
+    const length = direction.length();
+    if (length === 0) return;
 
     // Calculate movement direction (relative to world, not camera)
     const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
@@ -53,8 +55,13 @@ export class PlayerController {
     );
 
     // Simple position-based movement
-    this.playerMesh.position.x += moveDirection.x * deltaTime;
-    this.playerMesh.position.z += moveDirection.z * deltaTime;
+    const newX = this.playerMesh.position.x + moveDirection.x * deltaTime;
+    const newZ = this.playerMesh.position.z + moveDirection.z * deltaTime;
+
+    this.playerMesh.position.x = newX;
+    this.playerMesh.position.z = newZ;
+
+    console.log('🚶 Player moving to:', newX.toFixed(1), newZ.toFixed(1));
 
     // Rotate player to face movement direction
     if (moveDirection.length() > 0.1) {

@@ -50,15 +50,12 @@ export class VirtualJoystick {
   private setupPointerEvents(): void {
     // Use scene-level pointer observables for better mobile support
     this.scene.onPointerObservable.add((pointerInfo) => {
-      const canvas = this.scene.getEngine().getRenderingCanvas();
-      if (!canvas) return;
-
       const pointerX = pointerInfo.event.clientX;
       const pointerY = pointerInfo.event.clientY;
 
-      // Check if pointer is in joystick area (bottom-left corner)
+      // Joystick center is at 75px from left, 75px from bottom
       const screenCenterX = this.centerX;
-      const screenCenterY = canvas.height - this.centerY;
+      const screenCenterY = window.innerHeight - this.centerY;
 
       const distanceFromCenter = Math.sqrt(
         Math.pow(pointerX - screenCenterX, 2) +
@@ -67,9 +64,10 @@ export class VirtualJoystick {
 
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
-          // Only activate if touching in joystick area
+          // Only activate if touching in joystick area (within 100px of center)
           if (distanceFromCenter < 100) {
             this.isActive = true;
+            console.log('🕹️ Joystick activated at', pointerX, pointerY);
           }
           break;
 
@@ -102,12 +100,15 @@ export class VirtualJoystick {
           // Clamp to -1, 1 range
           this.direction.x = Math.max(-1, Math.min(1, this.direction.x));
           this.direction.y = Math.max(-1, Math.min(1, this.direction.y));
+
+          console.log('🕹️ Direction:', this.direction.x.toFixed(2), this.direction.y.toFixed(2));
           break;
 
         case PointerEventTypes.POINTERUP:
           if (!this.isActive) return;
 
           this.isActive = false;
+          console.log('🕹️ Joystick released');
 
           // Reset thumb to center
           this.innerCircle.left = this.centerX;
