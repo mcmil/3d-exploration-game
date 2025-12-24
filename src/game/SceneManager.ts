@@ -90,10 +90,10 @@ export class SceneManager {
     this.camera.lowerHeightOffsetLimit = 2; // Minimum 2 units above player
     this.camera.upperHeightOffsetLimit = 20; // Maximum 20 units above player
 
-    // Attach controls (FollowCamera only takes one parameter)
-    this.camera.attachControl(true);
+    // DON'T attach controls - we only want camera to follow, not respond to touch
+    // this.camera.attachControl(true);
 
-    console.log('📷 Follow camera created with ground protection');
+    console.log('📷 Follow camera created (auto-follow only, no manual controls)');
   }
 
   private createLighting(): void {

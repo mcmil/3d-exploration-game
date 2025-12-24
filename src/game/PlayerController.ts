@@ -61,8 +61,6 @@ export class PlayerController {
     this.playerMesh.position.x = newX;
     this.playerMesh.position.z = newZ;
 
-    console.log('🚶 Player moving to:', newX.toFixed(1), newZ.toFixed(1));
-
     // Rotate player to face movement direction
     if (moveDirection.length() > 0.1) {
       const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
