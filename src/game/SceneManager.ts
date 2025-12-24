@@ -115,7 +115,7 @@ export class SceneManager {
   }
 
   private createFallingSnow(): void {
-    const particleSystem = new ParticleSystem('snow', 2000, this.scene);
+    const particleSystem = new ParticleSystem('snow', 3000, this.scene);
 
     // Use a simple white texture
     particleSystem.particleTexture = new Texture(
@@ -124,36 +124,40 @@ export class SceneManager {
     );
 
     // Emission area - large box above the map
-    particleSystem.emitter = new Vector3(0, 40, 0);
-    particleSystem.minEmitBox = new Vector3(-100, 0, -100);
-    particleSystem.maxEmitBox = new Vector3(100, 0, 100);
+    particleSystem.emitter = new Vector3(0, 50, 0);
+    particleSystem.minEmitBox = new Vector3(-120, 0, -120);
+    particleSystem.maxEmitBox = new Vector3(120, 0, 120);
 
-    // Particle properties
-    particleSystem.color1 = new Color4(1, 1, 1, 1);
-    particleSystem.color2 = new Color4(0.9, 0.9, 1, 1);
-    particleSystem.colorDead = new Color4(1, 1, 1, 0);
+    // Bright white particles that stand out against gray ground
+    particleSystem.color1 = new Color4(1, 1, 1, 0.9);
+    particleSystem.color2 = new Color4(0.95, 0.97, 1, 0.95);
+    particleSystem.colorDead = new Color4(0.9, 0.92, 0.95, 0);
 
-    particleSystem.minSize = 0.3;
-    particleSystem.maxSize = 0.8;
+    // Larger, more visible snowflakes
+    particleSystem.minSize = 0.4;
+    particleSystem.maxSize = 1.2;
 
-    particleSystem.minLifeTime = 15;
-    particleSystem.maxLifeTime = 25;
+    particleSystem.minLifeTime = 20;
+    particleSystem.maxLifeTime = 30;
 
-    particleSystem.emitRate = 100;
+    particleSystem.emitRate = 150; // More snow
 
-    // Falling direction
-    particleSystem.direction1 = new Vector3(-1, -3, -0.5);
-    particleSystem.direction2 = new Vector3(1, -3, 0.5);
+    // Gentle falling with drift
+    particleSystem.direction1 = new Vector3(-1.5, -2.5, -0.8);
+    particleSystem.direction2 = new Vector3(1.5, -2.5, 0.8);
 
-    particleSystem.gravity = new Vector3(0, -0.5, 0);
+    particleSystem.gravity = new Vector3(0, -0.3, 0);
 
     particleSystem.minAngularSpeed = 0;
-    particleSystem.maxAngularSpeed = Math.PI;
+    particleSystem.maxAngularSpeed = Math.PI * 0.5;
 
-    particleSystem.minEmitPower = 0.5;
-    particleSystem.maxEmitPower = 1;
+    particleSystem.minEmitPower = 0.3;
+    particleSystem.maxEmitPower = 0.8;
 
-    particleSystem.updateSpeed = 0.01;
+    particleSystem.updateSpeed = 0.015;
+
+    // Blend mode for better visibility
+    particleSystem.blendMode = ParticleSystem.BLENDMODE_ADD;
 
     particleSystem.start();
   }

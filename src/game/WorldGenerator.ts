@@ -57,42 +57,41 @@ export class WorldGenerator {
   }
 
   private createSnowGround(size: number): void {
-    // Create ground with subdivisions for detail
-    const ground = MeshBuilder.CreateGroundFromHeightMap(
+    // Create ground with subdivisions for terrain detail
+    const ground = MeshBuilder.CreateGround(
       'snowGround',
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', // 1x1 transparent
-      {
-        width: size,
-        height: size,
-        subdivisions: 100,
-        minHeight: 0,
-        maxHeight: 0,
-      },
+      { width: size, height: size, subdivisions: 120 },
       this.scene
     );
 
     const groundMat = new StandardMaterial('groundMat', this.scene);
-    groundMat.diffuseColor = new Color3(0.92, 0.94, 0.98); // Cool white snow
-    groundMat.specularColor = new Color3(0.4, 0.4, 0.45); // More shine for snow
-    groundMat.specularPower = 32; // Crisp specular highlights
+    // Darker snow with blue-gray tint for contrast with particles and roads
+    groundMat.diffuseColor = new Color3(0.75, 0.78, 0.85);
+    groundMat.specularColor = new Color3(0.5, 0.5, 0.6);
+    groundMat.specularPower = 64; // Sharp specular for icy snow
 
-    // Add slight ambient color for depth
-    groundMat.ambientColor = new Color3(0.85, 0.88, 0.92);
+    // Darker ambient for shadows in drifts
+    groundMat.ambientColor = new Color3(0.6, 0.65, 0.75);
 
     ground.material = groundMat;
     ground.checkCollisions = true;
     ground.receiveShadows = true;
 
-    // Add small snow drifts (bumps) for variety
+    // Create dramatic snow drifts and terrain variation
     const positions = ground.getVerticesData('position');
     if (positions) {
       for (let i = 0; i < positions.length; i += 3) {
         const x = positions[i];
         const z = positions[i + 2];
-        // Simple noise-like pattern for snow drifts
-        const drift = Math.sin(x * 0.3) * Math.cos(z * 0.3) * 0.3 +
-                     Math.sin(x * 0.1) * Math.cos(z * 0.15) * 0.5;
-        positions[i + 1] = drift; // y position
+
+        // Multi-layered noise for realistic terrain
+        const largeDrifts = Math.sin(x * 0.05) * Math.cos(z * 0.05) * 2.5;
+        const mediumDrifts = Math.sin(x * 0.15) * Math.cos(z * 0.12) * 1.2;
+        const smallBumps = Math.sin(x * 0.4) * Math.cos(z * 0.35) * 0.5;
+        const random = (Math.sin(x * 1.3 + z * 0.7) + 1) * 0.3;
+
+        const height = largeDrifts + mediumDrifts + smallBumps + random;
+        positions[i + 1] = height; // y position
       }
       ground.updateVerticesData('position', positions);
       ground.createNormals(true);
@@ -205,28 +204,56 @@ export class WorldGenerator {
   }
 
   private createRoads(mapSize: number): void {
-    // Simple cross roads through the center
-    const roadWidth = 4;
+    // Cross roads through the center - darker for visibility
+    const roadWidth = 6; // Wider for better visibility
     const roadMat = new StandardMaterial('roadMat', this.scene);
-    roadMat.diffuseColor = new Color3(0.7, 0.7, 0.75); // Light gray (snow-covered road)
+    // Much darker gray for contrast with snow
+    roadMat.diffuseColor = new Color3(0.4, 0.42, 0.45);
+    roadMat.specularColor = new Color3(0.2, 0.2, 0.2);
 
-    // Horizontal road
+    // Horizontal road (east-west)
     const roadH = MeshBuilder.CreateGround(
       'roadH',
       { width: mapSize, height: roadWidth },
       this.scene
     );
-    roadH.position.y = 0.01; // Slightly above ground to prevent z-fighting
+    roadH.position.y = 0.2; // Above ground bumps
     roadH.material = roadMat;
 
-    // Vertical road
+    // Vertical road (north-south)
     const roadV = MeshBuilder.CreateGround(
       'roadV',
       { width: roadWidth, height: mapSize },
       this.scene
     );
-    roadV.position.y = 0.01;
+    roadV.position.y = 0.2;
     roadV.material = roadMat;
+
+    // Add tire tracks for detail
+    const trackMat = new StandardMaterial('trackMat', this.scene);
+    trackMat.diffuseColor = new Color3(0.3, 0.32, 0.35);
+
+    // Tire tracks on horizontal road
+    [-1.5, 1.5].forEach((offset) => {
+      const track = MeshBuilder.CreateGround(
+        'track',
+        { width: mapSize, height: 0.4 },
+        this.scene
+      );
+      track.position.set(0, 0.21, offset);
+      track.material = trackMat;
+    });
+
+    // Tire tracks on vertical road
+    [-1.5, 1.5].forEach((offset) => {
+      const track = MeshBuilder.CreateGround(
+        'track',
+        { width: 0.4, height: mapSize },
+        this.scene
+      );
+      track.position.set(offset, 0.21, 0);
+      track.material = trackMat;
+    });
   }
 
   private generatePowerPoles(numPoles: number, mapSize: number): void {
