@@ -117,11 +117,31 @@ export class SceneManager {
   private createFallingSnow(): void {
     const particleSystem = new ParticleSystem('snow', 5000, this.scene);
 
-    // Use a simple white texture
-    particleSystem.particleTexture = new Texture(
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAA+SURBVBiVY/j//z8DKYAJmzz7//8MYP7//wwM//8zMPz/z8Dw/z8Dw///DAz//zMw/P/PwPD/PwPD//8MDAwAALsXJ9VwXVfDAAAAAElFTkSuQmCC',
-      this.scene
-    );
+    // Create a simple circular texture programmatically
+    const textureSize = 64;
+    const texture = new Texture(null, this.scene);
+    const canvas = document.createElement('canvas');
+    canvas.width = textureSize;
+    canvas.height = textureSize;
+    const ctx = canvas.getContext('2d');
+
+    if (ctx) {
+      // Draw white circle with soft edges
+      const gradient = ctx.createRadialGradient(
+        textureSize / 2, textureSize / 2, 0,
+        textureSize / 2, textureSize / 2, textureSize / 2
+      );
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, textureSize, textureSize);
+
+      texture.updateURL(canvas.toDataURL());
+    }
+
+    particleSystem.particleTexture = texture;
 
     // Emission area - large box above the map
     particleSystem.emitter = new Vector3(0, 50, 0);
@@ -160,6 +180,8 @@ export class SceneManager {
     particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
     particleSystem.start();
+
+    console.log('❄️ Snow particle system started with', particleSystem.getCapacity(), 'particles');
   }
 
   public update(): void {
