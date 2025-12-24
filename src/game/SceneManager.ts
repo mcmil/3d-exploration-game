@@ -28,10 +28,6 @@ export class SceneManager {
     // Enable collision detection
     this.scene.collisionsEnabled = true;
 
-    // Mobile performance optimizations
-    this.scene.autoClear = false; // Don't auto-clear buffers
-    this.scene.autoClearDepthAndStencil = false;
-
     // Configure scene optimizer for automatic quality adjustment
     const options = SceneOptimizerOptions.ModerateDegradationAllowed();
     SceneOptimizer.OptimizeAsync(this.scene, options);
