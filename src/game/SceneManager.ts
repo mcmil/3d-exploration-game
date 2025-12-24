@@ -16,7 +16,7 @@ export class SceneManager {
   private scene: Scene;
   private camera: ArcRotateCamera | null = null;
 
-  constructor(private engine: Engine) {
+  constructor(engine: Engine) {
     this.scene = new Scene(engine);
     this.setupScene();
   }
