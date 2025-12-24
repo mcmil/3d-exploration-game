@@ -2,33 +2,35 @@ import { VirtualJoystick as BabylonJoystick } from '@babylonjs/core';
 import { Vector2 } from '@babylonjs/core';
 
 export class VirtualJoystick {
-  private joystick: BabylonJoystick;
+  private moveJoystick: BabylonJoystick;
+  private cameraJoystick: BabylonJoystick;
   private direction: Vector2 = Vector2.Zero();
+  private cameraRotation: Vector2 = Vector2.Zero();
 
   constructor() {
     // Create left joystick for movement
-    this.joystick = new BabylonJoystick(true); // true = left side
+    this.moveJoystick = new BabylonJoystick(true); // true = left side
+    this.moveJoystick.setJoystickColor('red');
+    this.moveJoystick.alwaysVisible = true;
 
-    // Make joystick always visible (not just on touch)
-    this.joystick.alwaysVisible = true;
+    // Create right joystick for camera control
+    this.cameraJoystick = new BabylonJoystick(false); // false = right side
+    this.cameraJoystick.setJoystickColor('green');
+    this.cameraJoystick.alwaysVisible = true;
 
-    // Set Christmas colors
-    this.joystick.setJoystickColor('red');
-
-    console.log('🕹️  Babylon.js built-in joystick initialized (always visible)');
+    console.log('🕹️  Two joysticks initialized: red (movement) and green (camera)');
   }
 
   public getDirection(): Vector2 {
-    // Babylon's joystick provides deltaPosition when pressed
-    if (this.joystick.pressed) {
-      // deltaPosition gives us the offset from center
-      const deltaX = this.joystick.deltaPosition.x;
-      const deltaY = this.joystick.deltaPosition.y;
+    // Movement joystick
+    if (this.moveJoystick.pressed) {
+      const deltaX = this.moveJoystick.deltaPosition.x;
+      const deltaY = this.moveJoystick.deltaPosition.y;
 
-      // Babylon joystick max is around 60 pixels, but normalize more aggressively
-      const maxDist = 30; // Smaller value = more sensitive
+      // Very aggressive normalization for fast movement
+      const maxDist = 20; // Even smaller = more sensitive
       this.direction.x = Math.max(-1, Math.min(1, deltaX / maxDist));
-      this.direction.y = Math.max(-1, Math.min(1, deltaY / maxDist)); // Don't invert yet
+      this.direction.y = Math.max(-1, Math.min(1, deltaY / maxDist));
 
       return this.direction.clone();
     }
@@ -36,11 +38,28 @@ export class VirtualJoystick {
     return Vector2.Zero();
   }
 
+  public getCameraRotation(): Vector2 {
+    // Camera joystick
+    if (this.cameraJoystick.pressed) {
+      const deltaX = this.cameraJoystick.deltaPosition.x;
+      const deltaY = this.cameraJoystick.deltaPosition.y;
+
+      const maxDist = 30;
+      this.cameraRotation.x = Math.max(-1, Math.min(1, deltaX / maxDist));
+      this.cameraRotation.y = Math.max(-1, Math.min(1, -deltaY / maxDist)); // Invert Y for natural camera
+
+      return this.cameraRotation.clone();
+    }
+
+    return Vector2.Zero();
+  }
+
   public isPressed(): boolean {
-    return this.joystick.pressed;
+    return this.moveJoystick.pressed;
   }
 
   public dispose(): void {
-    this.joystick.releaseCanvas();
+    this.moveJoystick.releaseCanvas();
+    this.cameraJoystick.releaseCanvas();
   }
 }

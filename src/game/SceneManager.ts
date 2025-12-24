@@ -2,7 +2,6 @@ import {
   Scene,
   Engine,
   ArcRotateCamera,
-  FollowCamera,
   HemisphericLight,
   Vector3,
   Color3,
@@ -17,7 +16,7 @@ import { PlayerController } from './PlayerController';
 
 export class SceneManager {
   private scene: Scene;
-  private camera: ArcRotateCamera | FollowCamera | null = null;
+  private camera: ArcRotateCamera | null = null;
   private player: PlayerController | null = null;
 
   constructor(engine: Engine) {
@@ -73,7 +72,7 @@ export class SceneManager {
       'camera',
       -Math.PI / 2, // Alpha (horizontal rotation) - behind player
       Math.PI / 3,  // Beta (vertical angle)
-      12,           // Radius (distance from target)
+      20,           // Radius (distance from target) - zoomed out more
       playerPos,    // Target the player position
       this.scene
     );
@@ -216,6 +215,10 @@ export class SceneManager {
 
   public getPlayer(): PlayerController | null {
     return this.player;
+  }
+
+  public getCamera(): ArcRotateCamera | null {
+    return this.camera;
   }
 
   public dispose(): void {

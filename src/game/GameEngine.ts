@@ -54,11 +54,24 @@ export class GameEngine {
     // Start render loop
     this.engine.runRenderLoop(() => {
       if (this.sceneManager) {
-        // Update player movement based on joystick input
+        // Update player movement based on movement joystick
         const player = this.sceneManager.getPlayer();
         if (player && this.joystick) {
           const direction = this.joystick.getDirection();
           player.move(direction);
+        }
+
+        // Update camera rotation based on camera joystick
+        const camera = this.sceneManager.getCamera();
+        if (camera && this.joystick) {
+          const cameraRotation = this.joystick.getCameraRotation();
+          const deltaTime = this.engine.getDeltaTime() / 1000;
+
+          // Rotate camera horizontally (alpha)
+          camera.alpha += cameraRotation.x * deltaTime * 2; // Multiply for faster rotation
+
+          // Rotate camera vertically (beta)
+          camera.beta -= cameraRotation.y * deltaTime * 2; // Subtract for natural direction
         }
 
         this.sceneManager.update();
@@ -66,7 +79,7 @@ export class GameEngine {
     });
 
     console.log('🎮 Game engine initialized!');
-    console.log('🕹️  Virtual joystick ready - touch bottom-left corner to move');
+    console.log('🕹️  Red joystick (left) - movement, Green joystick (right) - camera');
   }
 
   public getScene(): Scene | null {
