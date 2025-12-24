@@ -14,32 +14,32 @@ export class VirtualJoystick {
 
   constructor(advancedTexture: AdvancedDynamicTexture, scene: Scene) {
     this.scene = scene;
-    // Outer circle (joystick base) - MUCH LARGER and HIGHLY VISIBLE
+    // Outer circle (joystick base) - Christmas red theme
     this.outerCircle = new Ellipse();
-    this.outerCircle.width = '280px'; // Much larger (was 200px)
+    this.outerCircle.width = '280px';
     this.outerCircle.height = '280px';
-    this.outerCircle.color = '#00FFFF'; // Cyan color for high visibility
-    this.outerCircle.thickness = 8; // Thicker border
-    this.outerCircle.alpha = 0.9; // Very visible
-    this.outerCircle.background = 'rgba(0, 255, 255, 0.2)'; // Cyan tint
+    this.outerCircle.color = '#FF0000'; // Christmas red
+    this.outerCircle.thickness = 10; // Very thick border
+    this.outerCircle.alpha = 0.95;
+    this.outerCircle.background = 'rgba(255, 0, 0, 0.25)'; // Red tint
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.outerCircle.left = '140px'; // Adjusted for larger size
-    this.outerCircle.top = '-140px';
+    this.outerCircle.leftInPixels = 140; // Use pixels for exact positioning
+    this.outerCircle.topInPixels = -140;
     advancedTexture.addControl(this.outerCircle);
 
-    // Inner circle (joystick thumb) - MUCH LARGER and HIGHLY VISIBLE
+    // Inner circle (joystick thumb) - Christmas green theme
     this.innerCircle = new Ellipse();
-    this.innerCircle.width = '140px'; // Much larger (was 100px)
+    this.innerCircle.width = '140px';
     this.innerCircle.height = '140px';
-    this.innerCircle.color = '#FF00FF'; // Magenta color for contrast
-    this.innerCircle.thickness = 8; // Thicker border
-    this.innerCircle.background = 'rgba(255, 0, 255, 0.6)'; // Magenta fill
-    this.innerCircle.alpha = 1.0; // Fully visible
+    this.innerCircle.color = '#00FF00'; // Christmas green
+    this.innerCircle.thickness = 10; // Very thick border
+    this.innerCircle.background = 'rgba(0, 255, 0, 0.7)'; // Green fill
+    this.innerCircle.alpha = 1.0;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    this.innerCircle.left = '140px'; // Same as outer to center
-    this.innerCircle.top = '-140px'; // Same as outer to center
+    this.innerCircle.leftInPixels = 140; // Use pixels for exact positioning
+    this.innerCircle.topInPixels = -140;
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -95,9 +95,9 @@ export class VirtualJoystick {
             thumbDeltaY = Math.sin(angle) * maxDist;
           }
 
-          // Update thumb position (convert to pixel string)
-          this.innerCircle.left = `${140 + thumbDeltaX}px`;
-          this.innerCircle.top = `${-(140 - thumbDeltaY)}px`;
+          // Update thumb position using exact pixels
+          this.innerCircle.leftInPixels = 140 + thumbDeltaX;
+          this.innerCircle.topInPixels = -(140 - thumbDeltaY);
 
           // Calculate normalized direction
           this.direction.x = thumbDeltaX / maxDist;
@@ -116,9 +116,9 @@ export class VirtualJoystick {
           // Prevent camera from handling this event
           pointerInfo.event.preventDefault();
 
-          // Reset thumb to center
-          this.innerCircle.left = '140px';
-          this.innerCircle.top = '-140px';
+          // Reset thumb to center using exact pixels
+          this.innerCircle.leftInPixels = 140;
+          this.innerCircle.topInPixels = -140;
 
           // Clear direction
           this.direction = Vector2.Zero();

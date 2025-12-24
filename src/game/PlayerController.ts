@@ -57,6 +57,20 @@ export class PlayerController {
     hatMat.emissiveColor = new Color3(0.3, 0, 0);
     hat.material = hatMat;
 
+    // White pom-pom on top of Santa hat
+    const pompom = MeshBuilder.CreateSphere(
+      'pompom',
+      { diameter: 0.2 },
+      this.scene
+    );
+    pompom.position.y = 1.4; // On top of hat
+    pompom.parent = this.playerMesh;
+
+    const pompomMat = new StandardMaterial('pompomMat', this.scene);
+    pompomMat.diffuseColor = new Color3(1, 1, 1); // White
+    pompomMat.emissiveColor = new Color3(0.5, 0.5, 0.5); // Glowing white
+    pompom.material = pompomMat;
+
     // Eyes (two spheres) - positioned at the front
     const eyeMat = new StandardMaterial('eyeMat', this.scene);
     eyeMat.diffuseColor = new Color3(1, 1, 1); // White
