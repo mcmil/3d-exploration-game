@@ -27,8 +27,8 @@ export class VirtualJoystick {
       const deltaX = this.moveJoystick.deltaPosition.x;
       const deltaY = this.moveJoystick.deltaPosition.y;
 
-      // Very aggressive normalization for fast movement
-      const maxDist = 20; // Even smaller = more sensitive
+      // Extremely aggressive normalization for very fast movement
+      const maxDist = 15; // Much smaller = very sensitive
       this.direction.x = Math.max(-1, Math.min(1, deltaX / maxDist));
       this.direction.y = Math.max(-1, Math.min(1, deltaY / maxDist));
 
@@ -44,7 +44,8 @@ export class VirtualJoystick {
       const deltaX = this.cameraJoystick.deltaPosition.x;
       const deltaY = this.cameraJoystick.deltaPosition.y;
 
-      const maxDist = 30;
+      // Very sensitive camera control
+      const maxDist = 20;
       this.cameraRotation.x = Math.max(-1, Math.min(1, deltaX / maxDist));
       this.cameraRotation.y = Math.max(-1, Math.min(1, -deltaY / maxDist)); // Invert Y for natural camera
 

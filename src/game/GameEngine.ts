@@ -67,11 +67,11 @@ export class GameEngine {
           const cameraRotation = this.joystick.getCameraRotation();
           const deltaTime = this.engine.getDeltaTime() / 1000;
 
-          // Rotate camera horizontally (alpha)
-          camera.alpha += cameraRotation.x * deltaTime * 2; // Multiply for faster rotation
+          // Rotate camera horizontally (alpha) - very fast
+          camera.alpha += cameraRotation.x * deltaTime * 5;
 
-          // Rotate camera vertically (beta)
-          camera.beta -= cameraRotation.y * deltaTime * 2; // Subtract for natural direction
+          // Rotate camera vertically (beta) - very fast
+          camera.beta -= cameraRotation.y * deltaTime * 5;
         }
 
         this.sceneManager.update();

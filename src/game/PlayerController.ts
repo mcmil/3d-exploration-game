@@ -11,8 +11,8 @@ import {
 export class PlayerController {
   private scene: Scene;
   private playerMesh: Mesh | null = null;
-  private moveSpeed: number = 25.0; // Much faster for responsive feel
-  private rotationSpeed: number = 0.2; // Faster rotation
+  private moveSpeed: number = 50.0; // Very fast for arcade-style movement
+  private rotationSpeed: number = 0.3; // Very fast rotation
 
   constructor(scene: Scene) {
     this.scene = scene;
