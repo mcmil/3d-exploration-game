@@ -17,6 +17,8 @@ export class VirtualJoystick {
   constructor(advancedTexture: AdvancedDynamicTexture, scene: Scene) {
     this.scene = scene;
 
+    console.log('🖥️  Window size:', window.innerWidth, 'x', window.innerHeight);
+
     // Outer circle (joystick base) - Christmas red theme
     this.outerCircle = new Ellipse();
     this.outerCircle.widthInPixels = 200;
@@ -27,12 +29,9 @@ export class VirtualJoystick {
     this.outerCircle.background = 'rgba(255, 0, 0, 0.25)';
     this.outerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.outerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    // Left edge at 50px (so 200px circle is centered at 150px from left)
     this.outerCircle.leftInPixels = 50;
-    // With BOTTOM alignment, topInPixels positions TOP edge from bottom of screen
-    // Want center at 150px from bottom, circle is 200px tall (radius 100px)
-    // So TOP edge = center + radius = 150 + 100 = 250px from bottom
-    this.outerCircle.topInPixels = 250;
+    this.outerCircle.topInPixels = -250;
+    console.log('🔴 Outer circle position: left=50, top=-250 (BOTTOM aligned)');
     advancedTexture.addControl(this.outerCircle);
 
     // Inner circle (joystick thumb) - Christmas green theme
@@ -45,11 +44,9 @@ export class VirtualJoystick {
     this.innerCircle.alpha = 1.0;
     this.innerCircle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.innerCircle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    // Left edge at 100px (so 100px circle is centered at 150px from left)
     this.innerCircle.leftInPixels = 100;
-    // Want center at 150px from bottom, circle is 100px tall (radius 50px)
-    // So TOP edge = center + radius = 150 + 50 = 200px from bottom
-    this.innerCircle.topInPixels = 200;
+    this.innerCircle.topInPixels = -200;
+    console.log('🟢 Inner circle position: left=100, top=-200 (BOTTOM aligned)');
     advancedTexture.addControl(this.innerCircle);
 
     this.setupPointerEvents();
@@ -75,6 +72,10 @@ export class VirtualJoystick {
 
       switch (pointerInfo.type) {
         case PointerEventTypes.POINTERDOWN:
+          console.log('👆 Touch at:', pointerX, pointerY,
+                      'Expected center:', screenCenterX, screenCenterY,
+                      'Distance:', distanceFromCenter.toFixed(1),
+                      'In area:', inJoystickArea);
           if (inJoystickArea) {
             this.isActive = true;
             pointerInfo.event.preventDefault();
@@ -104,10 +105,12 @@ export class VirtualJoystick {
           // Update thumb position
           // X: left edge = 100 (centered) + thumbDeltaX (right is positive)
           this.innerCircle.leftInPixels = 100 + thumbDeltaX;
-          // Y: topInPixels positions TOP edge from bottom
-          // Center starts at 150px from bottom, TOP edge at 200px
-          // Drag down (positive deltaY) moves center down: new top = 200 - thumbDeltaY
-          this.innerCircle.topInPixels = 200 - thumbDeltaY;
+          // Y: With BOTTOM alignment, negative top moves UP from bottom
+          // Center at -200, drag down (positive deltaY) makes more negative
+          this.innerCircle.topInPixels = -200 - thumbDeltaY;
+
+          console.log('🕹️  Thumb delta:', thumbDeltaX.toFixed(1), thumbDeltaY.toFixed(1),
+                      'Position:', this.innerCircle.leftInPixels, this.innerCircle.topInPixels);
 
           // Calculate normalized direction for game
           this.direction.x = thumbDeltaX / maxDist;
@@ -124,9 +127,9 @@ export class VirtualJoystick {
           this.isActive = false;
           pointerInfo.event.preventDefault();
 
-          // Reset thumb to center (center at 150px from bottom, TOP edge at 200px)
+          // Reset thumb to center
           this.innerCircle.leftInPixels = 100;
-          this.innerCircle.topInPixels = 200;
+          this.innerCircle.topInPixels = -200;
 
           // Clear direction
           this.direction = Vector2.Zero();
