@@ -46,12 +46,12 @@ export class HUD {
     const text = new TextBlock('objectiveText');
     text.text = 'Idź do domów z kolorowymi znacznikami. Dotknij lewej/prawej strony ekranu aby sterować.';
     text.color = 'black';
-    text.fontSize = 14;
+    text.fontSize = 18;
     text.fontWeight = 'bold';
-    text.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-    text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    text.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    text.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
     text.top = '-120px'; // At bottom, above HTML button
-    text.height = '25px';
+    text.height = '40px';
     text.shadowColor = 'white';
     text.shadowBlur = 8;
     text.shadowOffsetX = 2;
