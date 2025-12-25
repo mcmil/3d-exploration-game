@@ -39,35 +39,42 @@ export class PowerLineGame {
 
     console.log('⚡ Power Line Game started!');
 
-    // Create fullscreen overlay
+    // Disable joysticks by lowering their z-index
+    this.disableJoysticks();
+
+    // Create fullscreen overlay with high z-index
     this.overlay = AdvancedDynamicTexture.CreateFullscreenUI('PowerLineGameUI', true, this.scene);
+    this.overlay.layer!.layerMask = 0x0FFFFFFF; // High priority layer
 
     // Create background
     const background = new Rectangle('gameBg');
     background.width = 1.0;
     background.height = 1.0;
     background.background = 'rgba(0, 0, 0, 0.85)';
+    background.zIndex = 5000;
     this.overlay.addControl(background);
 
-    // Create title
+    // Create title - moved higher
     const title = new TextBlock('title');
     title.text = '⚡ FIX POWER LINE ⚡';
     title.color = '#FFD700';
     title.fontSize = 36;
     title.fontWeight = 'bold';
     title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '40px';
+    title.top = '20px'; // Moved from 40px
     title.height = '60px';
+    title.zIndex = 5001;
     this.overlay.addControl(title);
 
-    // Create instructions
+    // Create instructions - moved higher
     const instructions = new TextBlock('instructions');
     instructions.text = 'Tap the connections in order: 1 → 2 → 3 → 4 → 5';
     instructions.color = 'white';
-    instructions.fontSize = 20;
+    instructions.fontSize = 18;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '100px';
+    instructions.top = '80px'; // Moved from 100px
     instructions.height = '40px';
+    instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     // Create timer
@@ -78,9 +85,10 @@ export class PowerLineGame {
     this.timerText.fontWeight = 'bold';
     this.timerText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '40px';
+    this.timerText.top = '20px'; // Moved from 40px
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
+    this.timerText.zIndex = 5001;
     this.overlay.addControl(this.timerText);
 
     // Create progress text
@@ -89,8 +97,9 @@ export class PowerLineGame {
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
     this.progressText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.progressText.top = '150px';
+    this.progressText.top = '130px'; // Moved from 150px
     this.progressText.height = '40px';
+    this.progressText.zIndex = 5001;
     this.overlay.addControl(this.progressText);
 
     // Create 5 connection points
@@ -100,6 +109,30 @@ export class PowerLineGame {
     this.startTimer();
 
     console.log('🎮 Tap connections 1-5 in order!');
+  }
+
+  /**
+   * Disable joysticks by lowering their z-index
+   */
+  private disableJoysticks(): void {
+    const joystickCanvases = document.querySelectorAll('canvas');
+    joystickCanvases.forEach((canvas) => {
+      if (canvas.id !== 'renderCanvas') {
+        (canvas as HTMLCanvasElement).style.zIndex = '-1';
+      }
+    });
+  }
+
+  /**
+   * Re-enable joysticks by restoring their z-index
+   */
+  private enableJoysticks(): void {
+    const joystickCanvases = document.querySelectorAll('canvas');
+    joystickCanvases.forEach((canvas) => {
+      if (canvas.id !== 'renderCanvas') {
+        (canvas as HTMLCanvasElement).style.zIndex = '1';
+      }
+    });
   }
 
   /**
@@ -124,6 +157,7 @@ export class PowerLineGame {
       button.background = '#333333';
       button.left = `${positions[i].x}px`;
       button.top = `${positions[i].y}px`;
+      button.zIndex = 5002; // Above all other UI
 
       // Add number label
       const label = new TextBlock(`label_${i}`);
@@ -234,11 +268,13 @@ export class PowerLineGame {
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
+      successMsg.zIndex = 5003;
       this.overlay.addControl(successMsg);
     }
 
     // Close after 1.5 seconds
     setTimeout(() => {
+      this.enableJoysticks(); // Re-enable joysticks
       this.close();
       if (this.onSuccessCallback) {
         this.onSuccessCallback();
@@ -266,11 +302,13 @@ export class PowerLineGame {
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';
+      failMsg.zIndex = 5003;
       this.overlay.addControl(failMsg);
     }
 
     // Close after 1.5 seconds
     setTimeout(() => {
+      this.enableJoysticks(); // Re-enable joysticks
       this.close();
       if (this.onFailureCallback) {
         this.onFailureCallback();
