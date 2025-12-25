@@ -70,10 +70,10 @@ export class PowerLineGame {
     const instructions = new TextBlock('instructions');
     instructions.text = 'Dotknij połączenia po kolei: 1 → 2 → 3 → 4 → 5';
     instructions.color = 'white';
-    instructions.fontSize = 16;
+    instructions.fontSize = 14;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    instructions.top = '-80px';
-    instructions.height = '40px';
+    instructions.top = '-10px';
+    instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 

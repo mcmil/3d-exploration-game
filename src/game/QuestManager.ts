@@ -209,10 +209,10 @@ export class QuestManager {
    */
   public getQuestTypeName(type: QuestType): string {
     const names = {
-      power_outage: 'Power Outage',
-      satellite_tv: 'Satellite TV Problem',
-      device_repair: 'Device Repair',
-      memory_clear: 'Memory Clear'
+      power_outage: 'Awaria Prądu',
+      satellite_tv: 'Problem z Anteną Satelitarną',
+      device_repair: 'Naprawa Urządzenia',
+      memory_clear: 'Czyszczenie Pamięci'
     };
     return names[type];
   }

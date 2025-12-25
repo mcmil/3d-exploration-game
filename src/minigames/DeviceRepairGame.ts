@@ -72,10 +72,10 @@ export class DeviceRepairGame {
     const instructions = new TextBlock('instructions');
     instructions.text = 'Znajdź i dotknij 3 uszkodzone komponenty (czerwone)';
     instructions.color = 'white';
-    instructions.fontSize = 16;
+    instructions.fontSize = 14;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    instructions.top = '-120px';
-    instructions.height = '40px';
+    instructions.top = '-10px';
+    instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 

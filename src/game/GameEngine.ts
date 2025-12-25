@@ -162,12 +162,12 @@ export class GameEngine {
 
               // Update button text with quest type
               const questNames: { [key: string]: string } = {
-                power_outage: 'FIX POWER ⚡',
-                satellite_tv: 'FIX SATELLITE 📡',
-                device_repair: 'REPAIR DEVICE 🔧',
-                memory_clear: 'CLEAR MEMORY 💾'
+                power_outage: 'NAPRAW PRĄD ⚡',
+                satellite_tv: 'NAPRAW SATELITĘ 📡',
+                device_repair: 'NAPRAW URZĄDZENIE 🔧',
+                memory_clear: 'WYCZYŚĆ PAMIĘĆ 💾'
               };
-              this.htmlButton.textContent = questNames[nearestQuest.type] || 'FIX PROBLEM';
+              this.htmlButton.textContent = questNames[nearestQuest.type] || 'NAPRAW PROBLEM';
             } else {
               this.currentQuest = null;
               this.htmlButton.classList.remove('visible');

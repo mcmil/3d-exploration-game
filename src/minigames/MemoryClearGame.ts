@@ -64,9 +64,9 @@ export class MemoryClearGame {
     const instructions = new TextBlock('instructions');
     instructions.text = 'Obserwuj sekwencję, potem powtórz!';
     instructions.color = 'white';
-    instructions.fontSize = 16;
+    instructions.fontSize = 14;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    instructions.top = '-160px';
+    instructions.top = '-10px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
