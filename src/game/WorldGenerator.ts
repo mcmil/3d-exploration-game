@@ -112,12 +112,56 @@ export class WorldGenerator {
     const gridSize = Math.ceil(Math.sqrt(numHouses));
     const spacing = (mapSize * 0.8) / gridSize;
 
-    let houseCount = 0;
+    const roadWidth = 6; // Must match road width from createRoads()
+    const minDistanceFromSpawn = 15; // Minimum distance from player spawn at (0, 0)
+    const minDistanceFromRoad = roadWidth / 2 + 5; // Extra buffer from roads
 
-    for (let row = 0; row < gridSize && houseCount < numHouses; row++) {
-      for (let col = 0; col < gridSize && houseCount < numHouses; col++) {
-        const x = (col - gridSize / 2) * spacing + (Math.random() - 0.5) * spacing * 0.3;
-        const z = (row - gridSize / 2) * spacing + (Math.random() - 0.5) * spacing * 0.3;
+    let houseCount = 0;
+    const maxAttempts = 500; // Prevent infinite loops
+    let totalAttempts = 0;
+
+    for (let row = 0; row < gridSize && houseCount < numHouses && totalAttempts < maxAttempts; row++) {
+      for (let col = 0; col < gridSize && houseCount < numHouses && totalAttempts < maxAttempts; col++) {
+        let validPosition = false;
+        let attempts = 0;
+        let x = 0, z = 0;
+
+        // Try to find a valid position
+        while (!validPosition && attempts < 20) {
+          x = (col - gridSize / 2) * spacing + (Math.random() - 0.5) * spacing * 0.3;
+          z = (row - gridSize / 2) * spacing + (Math.random() - 0.5) * spacing * 0.3;
+
+          // Check distance from spawn point
+          const distFromSpawn = Math.sqrt(x * x + z * z);
+          if (distFromSpawn < minDistanceFromSpawn) {
+            attempts++;
+            totalAttempts++;
+            continue;
+          }
+
+          // Check if on vertical road (x near 0)
+          if (Math.abs(x) < minDistanceFromRoad) {
+            attempts++;
+            totalAttempts++;
+            continue;
+          }
+
+          // Check if on horizontal road (z near 0)
+          if (Math.abs(z) < minDistanceFromRoad) {
+            attempts++;
+            totalAttempts++;
+            continue;
+          }
+
+          // Valid position found
+          validPosition = true;
+        }
+
+        // Skip this house if no valid position found
+        if (!validPosition) {
+          totalAttempts++;
+          continue;
+        }
 
         const size = sizes[Math.floor(Math.random() * sizes.length)];
         const hasDish = Math.random() > 0.5; // 50% chance
@@ -137,6 +181,7 @@ export class WorldGenerator {
         const house = this.houseBuilder.createHouse(houseConfig);
         this.houses.push(house);
         houseCount++;
+        totalAttempts++;
       }
     }
   }
