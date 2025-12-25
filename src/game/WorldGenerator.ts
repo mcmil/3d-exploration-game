@@ -119,7 +119,8 @@ export class WorldGenerator {
         const size = sizes[Math.floor(Math.random() * sizes.length)];
         const hasDish = Math.random() > 0.5; // 50% chance
         const hasLights = Math.random() > 0.7; // 30% chance
-        const hasGraffiti = Math.random() > 0.7; // 30% chance for graffiti
+        const hasGraffiti = Math.random() > 0.7; // 30% chance for Pomorzanin graffiti
+        const hasPaprykarzGraffiti = Math.random() > 0.75; // 25% chance for Paprykarz graffiti
         // First house always gets coat of arms for visibility, then 40% chance for others
         const hasCoatOfArms = houseCount === 0 ? true : Math.random() > 0.6; // 40% chance
 
@@ -129,6 +130,7 @@ export class WorldGenerator {
           hasSatelliteDish: hasDish,
           hasChristmasLights: hasLights,
           hasGraffiti: hasGraffiti,
+          hasPaprykarzGraffiti: hasPaprykarzGraffiti,
           hasCoatOfArms: hasCoatOfArms,
         };
 
