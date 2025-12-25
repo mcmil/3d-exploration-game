@@ -3,6 +3,7 @@ import { SceneManager } from './SceneManager';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionSystem } from './InteractionSystem';
 import { QuestManager } from './QuestManager';
+import { HUD } from './HUD';
 
 export class GameEngine {
   private engine: Engine;
@@ -11,6 +12,7 @@ export class GameEngine {
   private joystick: VirtualJoystick | null = null;
   private interactionSystem: InteractionSystem | null = null;
   private questManager: QuestManager | null = null;
+  private hud: HUD | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -65,6 +67,35 @@ export class GameEngine {
       // Create quest manager and assign random quests
       this.questManager = new QuestManager(scene);
       this.questManager.assignRandomQuests(5); // 5 quests at game start
+
+      // Create HUD
+      this.hud = new HUD(scene);
+      const progress = this.questManager.getProgress();
+      this.hud.updateQuestCount(progress.completed, progress.total);
+
+      // Set up interaction button callback
+      this.hud.onInteractionButtonClick(() => {
+        if (this.interactionSystem && this.questManager && this.hud) {
+          const currentHouse = this.interactionSystem.getCurrentInteractable();
+          if (currentHouse) {
+            const quest = this.questManager.getQuestAtHouse(currentHouse.mesh);
+            if (quest) {
+              // Complete the quest
+              this.questManager.completeQuest(quest.id);
+
+              // Update HUD
+              const progress = this.questManager.getProgress();
+              this.hud.updateQuestCount(progress.completed, progress.total);
+              this.hud.hideInteractionPrompt();
+
+              // Check if all quests completed
+              if (this.questManager.allQuestsCompleted()) {
+                this.hud.showCompletionMessage();
+              }
+            }
+          }
+        }
+      });
     }
 
     // Start render loop
@@ -109,6 +140,26 @@ export class GameEngine {
         // Update interaction system
         if (this.interactionSystem) {
           this.interactionSystem.update();
+
+          // Update HUD based on interaction state
+          if (this.hud && this.questManager) {
+            const currentHouse = this.interactionSystem.getCurrentInteractable();
+            if (currentHouse) {
+              const quest = this.questManager.getQuestAtHouse(currentHouse.mesh);
+              if (quest) {
+                this.hud.showInteractionPrompt(quest.type);
+              } else {
+                this.hud.hideInteractionPrompt();
+              }
+            } else {
+              this.hud.hideInteractionPrompt();
+            }
+          }
+        }
+
+        // Update HUD
+        if (this.hud) {
+          this.hud.update();
         }
 
         this.sceneManager.update();
@@ -124,6 +175,7 @@ export class GameEngine {
   }
 
   public dispose(): void {
+    this.hud?.dispose();
     this.questManager?.dispose();
     this.interactionSystem?.dispose();
     this.sceneManager?.dispose();
@@ -132,5 +184,9 @@ export class GameEngine {
 
   public getQuestManager(): QuestManager | null {
     return this.questManager;
+  }
+
+  public getHUD(): HUD | null {
+    return this.hud;
   }
 }
