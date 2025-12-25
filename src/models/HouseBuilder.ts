@@ -5,6 +5,7 @@ import {
   Color3,
   Vector3,
   Mesh,
+  DynamicTexture,
 } from '@babylonjs/core';
 
 export interface HouseConfig {
@@ -244,7 +245,7 @@ export class HouseBuilder {
   }
 
   private addGraffiti(parent: Mesh, width: number, height: number, _depth: number): void {
-    // Create "POMORZANIN PANY" graffiti on side wall
+    // Create "POMORZANIN PANY" graffiti on side wall with actual text rendering
     const graffiti = MeshBuilder.CreatePlane(
       'graffiti',
       { width: width * 0.8, height: 0.8 },
@@ -254,10 +255,35 @@ export class HouseBuilder {
     graffiti.rotation.y = -Math.PI / 2;
     graffiti.parent = parent;
 
+    // Create dynamic texture for text rendering
+    const textureResolution = 512;
+    const dynamicTexture = new DynamicTexture(
+      'graffitiTexture',
+      { width: textureResolution, height: textureResolution / 4 },
+      this.scene,
+      false
+    );
+
+    // Draw text using drawText method
+    const font = 'bold 80px Arial';
+    const textColor = '#FF3333'; // Red spray paint
+    const backgroundColor = null; // Transparent
+
+    dynamicTexture.drawText(
+      'POMORZANIN PANY',
+      null,
+      null,
+      font,
+      textColor,
+      backgroundColor,
+      true,
+      true
+    );
+
     const graffitiMat = new StandardMaterial('graffitiMat', this.scene);
-    // Spray paint style - bright colors
-    graffitiMat.diffuseColor = new Color3(1, 0.2, 0.2); // Red spray paint
-    graffitiMat.emissiveColor = new Color3(0.3, 0, 0);
+    graffitiMat.diffuseTexture = dynamicTexture;
+    graffitiMat.emissiveColor = new Color3(0.3, 0, 0); // Slight glow
+    graffitiMat.opacityTexture = dynamicTexture;
     graffiti.material = graffitiMat;
   }
 

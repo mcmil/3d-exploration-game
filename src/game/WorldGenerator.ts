@@ -120,7 +120,8 @@ export class WorldGenerator {
         const hasDish = Math.random() > 0.5; // 50% chance
         const hasLights = Math.random() > 0.7; // 30% chance
         const hasGraffiti = Math.random() > 0.7; // 30% chance for graffiti
-        const hasCoatOfArms = Math.random() > 0.8; // 20% chance for coat of arms
+        // First house always gets coat of arms for visibility, then 40% chance for others
+        const hasCoatOfArms = houseCount === 0 ? true : Math.random() > 0.6; // 40% chance
 
         const houseConfig: HouseConfig = {
           position: new Vector3(x, 0, z),
