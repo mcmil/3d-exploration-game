@@ -1,5 +1,3 @@
-import { Scene, Sound } from '@babylonjs/core';
-
 export type SoundEffect =
   | 'interaction_enter'
   | 'interaction_leave'
@@ -10,42 +8,47 @@ export type SoundEffect =
   | 'collision';
 
 export class AudioManager {
-  private scene: Scene;
-  private sounds: Map<SoundEffect, Sound> = new Map();
+  private buffers: Map<SoundEffect, AudioBuffer> = new Map();
   private sfxVolume: number = 0.5;
   private muted: boolean = false;
-  private audioContext: AudioContext;
+  private audioContext: AudioContext | null = null;
   private initialized: boolean = false;
 
-  constructor(scene: Scene) {
-    this.scene = scene;
-    this.audioContext = new AudioContext();
-
-    // Try to initialize sounds immediately
-    this.initializeSounds();
-
-    // Also resume audio context on first user interaction
+  constructor() {
+    // Delay initialization until first user interaction
     this.setupUserInteractionHandler();
   }
 
   /**
-   * Setup handler to resume AudioContext on user interaction
+   * Setup handler to initialize audio on user interaction
    */
   private setupUserInteractionHandler(): void {
-    const resumeAudio = async () => {
-      if (this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
-        console.log('🎵 AudioContext resumed');
-      }
-      if (!this.initialized) {
-        this.initializeSounds();
+    const initAudio = async () => {
+      try {
+        // Create and resume AudioContext on user interaction
+        if (!this.audioContext) {
+          this.audioContext = new AudioContext();
+          console.log('🎵 AudioContext created, state:', this.audioContext.state);
+        }
+
+        if (this.audioContext.state === 'suspended') {
+          await this.audioContext.resume();
+          console.log('🎵 AudioContext resumed, state:', this.audioContext.state);
+        }
+
+        // Initialize sounds only after context is running
+        if (!this.initialized && this.audioContext.state === 'running') {
+          this.initializeSounds();
+        }
+      } catch (error) {
+        console.error('❌ Failed to initialize audio:', error);
       }
     };
 
     // Listen for any user interaction
-    document.addEventListener('click', resumeAudio, { once: true });
-    document.addEventListener('touchstart', resumeAudio, { once: true });
-    document.addEventListener('keydown', resumeAudio, { once: true });
+    document.addEventListener('click', initAudio, { once: true });
+    document.addEventListener('touchstart', initAudio, { once: true });
+    document.addEventListener('keydown', initAudio, { once: true });
   }
 
   /**
@@ -53,7 +56,11 @@ export class AudioManager {
    * Uses procedurally generated sounds via oscillators
    */
   private initializeSounds(): void {
+    if (!this.audioContext) return;
+
     try {
+      console.log('🎵 Initializing sounds...');
+
       // Create simple bell chime for entering interaction range
       this.createBellChime('interaction_enter', [523.25, 659.25, 783.99], 0.3); // C5, E5, G5 (C major chord)
 
@@ -76,7 +83,7 @@ export class AudioManager {
       this.createCollision('collision');
 
       this.initialized = true;
-      console.log('🎵 Audio system initialized with', this.sounds.size, 'sounds');
+      console.log('🎵 Audio system initialized with', this.buffers.size, 'sounds');
     } catch (error) {
       console.error('❌ Failed to initialize audio:', error);
     }
@@ -86,6 +93,8 @@ export class AudioManager {
    * Create a bell chime sound
    */
   private createBellChime(name: SoundEffect, frequencies: number[], duration: number): void {
+    if (!this.audioContext) return;
+
     const sampleRate = this.audioContext.sampleRate;
     const length = sampleRate * duration;
     const buffer = this.audioContext.createBuffer(1, length, sampleRate);
@@ -103,19 +112,14 @@ export class AudioManager {
       data[i] = sample / frequencies.length * 0.3; // Normalize
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume
-    });
-
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create a whoosh sound (white noise with filter)
    */
   private createWhoosh(name: SoundEffect): void {
+    if (!this.audioContext) return;
     const sampleRate = this.audioContext.sampleRate;
     const duration = 0.15;
     const length = sampleRate * duration;
@@ -128,19 +132,15 @@ export class AudioManager {
       data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 15) * 0.15;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume * 0.4
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create a success jingle (ascending arpeggio)
    */
   private createSuccessJingle(name: SoundEffect): void {
+    if (!this.audioContext) return;
     
     const sampleRate = this.audioContext.sampleRate;
     const duration = 0.6;
@@ -170,19 +170,15 @@ export class AudioManager {
       data[i] = sample * 0.3;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create quest completion fanfare
    */
   private createQuestComplete(name: SoundEffect): void {
+    if (!this.audioContext) return;
     
     const sampleRate = this.audioContext.sampleRate;
     const duration = 1.0;
@@ -215,19 +211,15 @@ export class AudioManager {
       data[i] = sample * 0.25;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create sleigh bells sound
    */
   private createSleighBells(name: SoundEffect): void {
+    if (!this.audioContext) return;
     
     const sampleRate = this.audioContext.sampleRate;
     const duration = 1.2;
@@ -255,19 +247,15 @@ export class AudioManager {
       data[i] = sample;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume * 0.7
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create ho-ho-ho laugh sound
    */
   private createHoHoHo(name: SoundEffect): void {
+    if (!this.audioContext) return;
     
     const sampleRate = this.audioContext.sampleRate;
     const duration = 0.9;
@@ -298,19 +286,15 @@ export class AudioManager {
       data[i] = sample * 0.35;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
    * Create collision/bump sound
    */
   private createCollision(name: SoundEffect): void {
+    if (!this.audioContext) return;
     const sampleRate = this.audioContext.sampleRate;
     const duration = 0.12;
     const length = sampleRate * duration;
@@ -326,30 +310,41 @@ export class AudioManager {
       data[i] = (thump + noise) * 0.4;
     }
 
-    const sound = new Sound(name, buffer, this.scene, null, {
-      autoplay: false,
-      loop: false,
-      volume: this.sfxVolume * 0.3
-    });
 
-    this.sounds.set(name, sound);
+    this.buffers.set(name, buffer);
   }
 
   /**
-   * Play a sound effect
+   * Play a sound effect using Web Audio API
    */
   public play(effect: SoundEffect): void {
-    if (this.muted) return;
+    if (this.muted || !this.audioContext) return;
 
-    const sound = this.sounds.get(effect);
-    if (sound) {
-      // Stop if already playing to allow retriggering
-      if (sound.isPlaying) {
-        sound.stop();
-      }
-      sound.play();
-    } else {
+    const buffer = this.buffers.get(effect);
+    if (!buffer) {
       console.warn(`⚠️ Sound effect '${effect}' not found`);
+      return;
+    }
+
+    try {
+      // Create buffer source
+      const source = this.audioContext.createBufferSource();
+      source.buffer = buffer;
+
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.gain.value = this.sfxVolume;
+
+      // Connect: source -> gain -> destination
+      source.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+
+      // Play
+      source.start(0);
+
+      console.log(`🔊 Playing sound: ${effect}`);
+    } catch (error) {
+      console.error(`❌ Failed to play sound '${effect}':`, error);
     }
   }
 
@@ -358,9 +353,6 @@ export class AudioManager {
    */
   public setSFXVolume(volume: number): void {
     this.sfxVolume = Math.max(0, Math.min(1, volume));
-    this.sounds.forEach(sound => {
-      sound.setVolume(this.sfxVolume);
-    });
   }
 
   /**
@@ -379,11 +371,13 @@ export class AudioManager {
   }
 
   /**
-   * Clean up all sounds
+   * Clean up resources
    */
   public dispose(): void {
-    this.sounds.forEach(sound => sound.dispose());
-    this.sounds.clear();
+    this.buffers.clear();
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
     console.log('🔇 Audio system disposed');
   }
 }
