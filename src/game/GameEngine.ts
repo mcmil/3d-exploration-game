@@ -93,6 +93,38 @@ export class GameEngine {
           console.log('❌ No current quest available');
         }
       });
+
+      // Add manual touch detection for button area (joystick bypass)
+      this.canvas.addEventListener('touchstart', (event: TouchEvent) => {
+        if (!this.currentQuest || !this.hud) return;
+
+        const touch = event.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+
+        // Button is centered horizontally, 30px from bottom, 220px wide, 70px tall
+        const buttonWidth = 220;
+        const buttonHeight = 70;
+        const buttonBottom = 30;
+        const buttonCenterX = rect.width / 2;
+        const buttonLeft = buttonCenterX - buttonWidth / 2;
+        const buttonRight = buttonCenterX + buttonWidth / 2;
+        const buttonTop = rect.height - buttonBottom - buttonHeight;
+        const buttonBottomY = rect.height - buttonBottom;
+
+        // Check if touch is within button bounds
+        if (touchX >= buttonLeft && touchX <= buttonRight &&
+            touchY >= buttonTop && touchY <= buttonBottomY) {
+          console.log('🎯 Touch detected in button area!', { touchX, touchY, buttonLeft, buttonRight, buttonTop, buttonBottomY });
+          event.preventDefault(); // Prevent joystick from capturing
+          event.stopPropagation();
+
+          if (this.questManager) {
+            this.startMiniGame(this.currentQuest.type, this.currentQuest.id);
+          }
+        }
+      }, { passive: false });
     }
 
     // Start render loop
