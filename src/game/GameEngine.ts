@@ -5,6 +5,9 @@ import { InteractionSystem } from './InteractionSystem';
 import { QuestManager } from './QuestManager';
 import { HUD } from './HUD';
 import { PowerLineGame } from '../minigames/PowerLineGame';
+import { SatelliteTVGame } from '../minigames/SatelliteTVGame';
+import { DeviceRepairGame } from '../minigames/DeviceRepairGame';
+import { MemoryClearGame } from '../minigames/MemoryClearGame';
 
 export class GameEngine {
   private engine: Engine;
@@ -14,7 +17,7 @@ export class GameEngine {
   private interactionSystem: InteractionSystem | null = null;
   private questManager: QuestManager | null = null;
   private hud: HUD | null = null;
-  private currentMiniGame: PowerLineGame | null = null;
+  private currentMiniGame: PowerLineGame | SatelliteTVGame | DeviceRepairGame | MemoryClearGame | null = null;
   private currentQuest: any = null; // Store current nearby quest
   private htmlButton: HTMLButtonElement; // HTML button outside canvas
 
@@ -190,18 +193,38 @@ export class GameEngine {
 
     // Hide HUD during mini-game
     this.hud.hideInteractionPrompt();
+    this.htmlButton.classList.remove('visible');
+
+    const scene = this.sceneManager!.getScene()!;
 
     if (questType === 'power_outage') {
       // Launch Power Line mini-game
-      this.currentMiniGame = new PowerLineGame(this.sceneManager!.getScene()!);
+      this.currentMiniGame = new PowerLineGame(scene);
       this.currentMiniGame.start(
         () => this.onMiniGameSuccess(questId),
         () => this.onMiniGameFailure()
       );
-    } else {
-      // For other quest types, complete immediately (mini-games to be added later)
-      console.log(`⚠️ No mini-game for ${questType} yet, completing automatically`);
-      this.onMiniGameSuccess(questId);
+    } else if (questType === 'satellite_tv') {
+      // Launch Satellite TV mini-game
+      this.currentMiniGame = new SatelliteTVGame(scene);
+      this.currentMiniGame.start(
+        () => this.onMiniGameSuccess(questId),
+        () => this.onMiniGameFailure()
+      );
+    } else if (questType === 'device_repair') {
+      // Launch Device Repair mini-game
+      this.currentMiniGame = new DeviceRepairGame(scene);
+      this.currentMiniGame.start(
+        () => this.onMiniGameSuccess(questId),
+        () => this.onMiniGameFailure()
+      );
+    } else if (questType === 'memory_clear') {
+      // Launch Memory Clear mini-game
+      this.currentMiniGame = new MemoryClearGame(scene);
+      this.currentMiniGame.start(
+        () => this.onMiniGameSuccess(questId),
+        () => this.onMiniGameFailure()
+      );
     }
   }
 
