@@ -1,12 +1,14 @@
 import { Engine, Scene } from '@babylonjs/core';
 import { SceneManager } from './SceneManager';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
+import { InteractionSystem } from './InteractionSystem';
 
 export class GameEngine {
   private engine: Engine;
   private canvas: HTMLCanvasElement;
   private sceneManager: SceneManager | null = null;
   private joystick: VirtualJoystick | null = null;
+  private interactionSystem: InteractionSystem | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -51,6 +53,14 @@ export class GameEngine {
     // Create virtual joystick (uses Babylon.js built-in)
     this.joystick = new VirtualJoystick();
 
+    // Create interaction system
+    const player = this.sceneManager.getPlayer();
+    const scene = this.sceneManager.getScene();
+    if (player && scene) {
+      this.interactionSystem = new InteractionSystem(scene, player);
+      console.log('🔧 Interaction system initialized!');
+    }
+
     // Start render loop
     this.engine.runRenderLoop(() => {
       if (this.sceneManager) {
@@ -88,6 +98,11 @@ export class GameEngine {
             const radiusDiff = this.sceneManager.defaultRadius - camera.radius;
             camera.radius += radiusDiff * snapSpeed * deltaTime;
           }
+        }
+
+        // Update interaction system
+        if (this.interactionSystem) {
+          this.interactionSystem.update();
         }
 
         this.sceneManager.update();
