@@ -268,6 +268,9 @@ export class PowerLineGame {
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
+      successMsg.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+      successMsg.top = '300px';
+      successMsg.height = '60px';
       successMsg.zIndex = 5003;
       this.overlay.addControl(successMsg);
     }
@@ -302,6 +305,9 @@ export class PowerLineGame {
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';
+      failMsg.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+      failMsg.top = '300px';
+      failMsg.height = '60px';
       failMsg.zIndex = 5003;
       this.overlay.addControl(failMsg);
     }

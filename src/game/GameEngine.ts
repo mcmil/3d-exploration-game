@@ -151,7 +151,7 @@ export class GameEngine {
           this.interactionSystem.update();
 
           // Check if player is near any quest and update HTML button
-          if (this.questManager && player) {
+          if (this.questManager && player && !this.currentMiniGame) {
             const playerPos = player.getPosition();
             const nearestQuest = this.questManager.getNearestQuest(playerPos);
 
