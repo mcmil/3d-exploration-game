@@ -31,7 +31,8 @@ export class PlayerController {
       this.scene
     );
 
-    this.playerMesh.position = new Vector3(0, 1, -5);
+    // Spawn player away from the repair van (van is at 0, 0, -5)
+    this.playerMesh.position = new Vector3(5, 1, -5);
 
     // Player material (bright orange for visibility)
     const playerMat = new StandardMaterial('playerMat', this.scene);
