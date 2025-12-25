@@ -64,7 +64,7 @@ export class DeviceRepairGame {
     title.fontSize = 36;
     title.fontWeight = 'bold';
     title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '20px';
+    title.top = '40px';
     title.height = '60px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
@@ -74,7 +74,7 @@ export class DeviceRepairGame {
     instructions.color = 'white';
     instructions.fontSize = 14;
     instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '85px';
+    instructions.top = '110px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
@@ -86,7 +86,7 @@ export class DeviceRepairGame {
     this.timerText.fontWeight = 'bold';
     this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '20px';
+    this.timerText.top = '40px';
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
     this.timerText.zIndex = 5001;
@@ -97,7 +97,7 @@ export class DeviceRepairGame {
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
     this.progressText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.progressText.top = '130px';
+    this.progressText.top = '160px';
     this.progressText.height = '40px';
     this.progressText.zIndex = 5001;
     this.overlay.addControl(this.progressText);

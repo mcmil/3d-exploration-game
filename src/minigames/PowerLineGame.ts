@@ -54,25 +54,25 @@ export class PowerLineGame {
     background.zIndex = 5000;
     this.overlay.addControl(background);
 
-    // Create title - moved higher
+    // Create title
     const title = new TextBlock('title');
     title.text = '⚡ NAPRAW LINIĘ ELEKTRYCZNĄ ⚡';
     title.color = '#FFD700';
     title.fontSize = 36;
     title.fontWeight = 'bold';
     title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '20px';
+    title.top = '40px';
     title.height = '60px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
 
-    // Create instructions - below title at top
+    // Create instructions - below title
     const instructions = new TextBlock('instructions');
     instructions.text = 'Dotknij połączenia po kolei: 1 → 2 → 3 → 4 → 5';
     instructions.color = 'white';
     instructions.fontSize = 14;
     instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '85px';
+    instructions.top = '110px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
@@ -85,7 +85,7 @@ export class PowerLineGame {
     this.timerText.fontWeight = 'bold';
     this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '20px';
+    this.timerText.top = '40px';
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
     this.timerText.zIndex = 5001;
@@ -97,7 +97,7 @@ export class PowerLineGame {
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
     this.progressText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.progressText.top = '130px';
+    this.progressText.top = '160px';
     this.progressText.height = '40px';
     this.progressText.zIndex = 5001;
     this.overlay.addControl(this.progressText);
