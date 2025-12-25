@@ -72,7 +72,7 @@ export class DeviceRepairGame {
     const instructions = new TextBlock('instructions');
     instructions.text = 'Znajdź i dotknij 3 uszkodzone komponenty (czerwone)';
     instructions.color = 'white';
-    instructions.fontSize = 14;
+    instructions.fontSize = 18;
     instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     instructions.top = '150px';
     instructions.height = '30px';
@@ -84,10 +84,10 @@ export class DeviceRepairGame {
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
-    this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '60px';
-    this.timerText.left = '-40px';
+    this.timerText.top = '250px';
+    this.timerText.left = '0px';
     this.timerText.height = '40px';
     this.timerText.zIndex = 5001;
     this.overlay.addControl(this.timerText);
