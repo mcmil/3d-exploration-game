@@ -4,6 +4,7 @@ import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionSystem } from './InteractionSystem';
 import { QuestManager } from './QuestManager';
 import { HUD } from './HUD';
+import { PowerLineGame } from '../minigames/PowerLineGame';
 
 export class GameEngine {
   private engine: Engine;
@@ -13,6 +14,7 @@ export class GameEngine {
   private interactionSystem: InteractionSystem | null = null;
   private questManager: QuestManager | null = null;
   private hud: HUD | null = null;
+  private currentMiniGame: PowerLineGame | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -80,18 +82,7 @@ export class GameEngine {
           if (currentHouse) {
             const quest = this.questManager.getQuestAtHouse(currentHouse.mesh);
             if (quest) {
-              // Complete the quest
-              this.questManager.completeQuest(quest.id);
-
-              // Update HUD
-              const progress = this.questManager.getProgress();
-              this.hud.updateQuestCount(progress.completed, progress.total);
-              this.hud.hideInteractionPrompt();
-
-              // Check if all quests completed
-              if (this.questManager.allQuestsCompleted()) {
-                this.hud.showCompletionMessage();
-              }
+              this.startMiniGame(quest.type, quest.id);
             }
           }
         }
@@ -167,6 +158,73 @@ export class GameEngine {
     });
 
     console.log('🎮 Game engine initialized!');
+  }
+
+  /**
+   * Start mini-game based on quest type
+   */
+  private startMiniGame(questType: string, questId: string): void {
+    if (!this.questManager || !this.hud) return;
+
+    console.log(`🎮 Starting mini-game for ${questType}`);
+
+    // Hide HUD during mini-game
+    this.hud.hideInteractionPrompt();
+
+    if (questType === 'power_outage') {
+      // Launch Power Line mini-game
+      this.currentMiniGame = new PowerLineGame(this.sceneManager!.getScene()!);
+      this.currentMiniGame.start(
+        () => this.onMiniGameSuccess(questId),
+        () => this.onMiniGameFailure()
+      );
+    } else {
+      // For other quest types, complete immediately (mini-games to be added later)
+      console.log(`⚠️ No mini-game for ${questType} yet, completing automatically`);
+      this.onMiniGameSuccess(questId);
+    }
+  }
+
+  /**
+   * Called when mini-game is completed successfully
+   */
+  private onMiniGameSuccess(questId: string): void {
+    if (!this.questManager || !this.hud) return;
+
+    console.log('✅ Mini-game success! Completing quest...');
+
+    // Clean up mini-game
+    if (this.currentMiniGame) {
+      this.currentMiniGame.dispose();
+      this.currentMiniGame = null;
+    }
+
+    // Complete the quest
+    this.questManager.completeQuest(questId);
+
+    // Update HUD
+    const progress = this.questManager.getProgress();
+    this.hud.updateQuestCount(progress.completed, progress.total);
+
+    // Check if all quests completed
+    if (this.questManager.allQuestsCompleted()) {
+      this.hud.showCompletionMessage();
+    }
+  }
+
+  /**
+   * Called when mini-game fails
+   */
+  private onMiniGameFailure(): void {
+    console.log('❌ Mini-game failed! Quest remains active.');
+
+    // Clean up mini-game
+    if (this.currentMiniGame) {
+      this.currentMiniGame.dispose();
+      this.currentMiniGame = null;
+    }
+
+    // Quest remains active, player can try again
     console.log('🕹️  Red joystick (left) - movement, Green joystick (right) - camera (snaps back)');
   }
 
@@ -175,6 +233,7 @@ export class GameEngine {
   }
 
   public dispose(): void {
+    this.currentMiniGame?.dispose();
     this.hud?.dispose();
     this.questManager?.dispose();
     this.interactionSystem?.dispose();
