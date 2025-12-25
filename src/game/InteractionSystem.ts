@@ -1,4 +1,4 @@
-import { Scene, Mesh, Vector3 } from '@babylonjs/core';
+import { Scene, Mesh, Vector3, GlowLayer, Color3, MeshBuilder, StandardMaterial } from '@babylonjs/core';
 import { PlayerController } from './PlayerController';
 
 export interface InteractableHouse {
@@ -12,10 +12,19 @@ export class InteractionSystem {
   private player: PlayerController;
   private readonly interactionRange: number = 4.0; // Distance to interact
   private currentInteractable: InteractableHouse | null = null;
+  private glowLayer: GlowLayer;
+  private interactionIndicator: Mesh | null = null;
 
   constructor(scene: Scene, player: PlayerController) {
     this.scene = scene;
     this.player = player;
+
+    // Create glow layer for highlighting interactable houses
+    this.glowLayer = new GlowLayer('glow', scene, {
+      mainTextureFixedSize: 256,
+      blurKernelSize: 64
+    });
+    this.glowLayer.intensity = 1.5;
   }
 
   /**
@@ -91,7 +100,39 @@ export class InteractionSystem {
    */
   private onEnterInteractionRange(house: InteractableHouse): void {
     console.log('✨ Entered interaction range of house at:', house.position);
-    // Visual feedback will be added here later
+
+    // Add glow effect to house
+    this.glowLayer.addIncludedOnlyMesh(house.mesh);
+    this.glowLayer.customEmissiveColorSelector = (mesh, _subMesh, _material, result) => {
+      if (mesh === house.mesh) {
+        result.set(0.2, 1.0, 0.2, 1.0); // Green glow
+      }
+    };
+
+    // Create floating indicator above house
+    this.interactionIndicator = MeshBuilder.CreateSphere('indicator', {
+      diameter: 0.8,
+      segments: 8
+    }, this.scene);
+
+    const indicatorMat = new StandardMaterial('indicatorMat', this.scene);
+    indicatorMat.emissiveColor = new Color3(0.2, 1.0, 0.2); // Bright green
+    indicatorMat.disableLighting = true;
+    this.interactionIndicator.material = indicatorMat;
+
+    // Position above house
+    this.interactionIndicator.position = new Vector3(
+      house.position.x,
+      house.position.y + 6.0, // Float above house
+      house.position.z
+    );
+
+    // Animate indicator (bobbing motion)
+    this.scene.registerBeforeRender(() => {
+      if (this.interactionIndicator) {
+        this.interactionIndicator.position.y = house.position.y + 6.0 + Math.sin(Date.now() / 300) * 0.3;
+      }
+    });
   }
 
   /**
@@ -99,7 +140,15 @@ export class InteractionSystem {
    */
   private onLeaveInteractionRange(house: InteractableHouse): void {
     console.log('👋 Left interaction range of house at:', house.position);
-    // Remove visual feedback here later
+
+    // Remove glow effect
+    this.glowLayer.removeIncludedOnlyMesh(house.mesh);
+
+    // Remove floating indicator
+    if (this.interactionIndicator) {
+      this.interactionIndicator.dispose();
+      this.interactionIndicator = null;
+    }
   }
 
   /**
@@ -107,5 +156,16 @@ export class InteractionSystem {
    */
   public getInteractionRange(): number {
     return this.interactionRange;
+  }
+
+  /**
+   * Clean up resources
+   */
+  public dispose(): void {
+    if (this.interactionIndicator) {
+      this.interactionIndicator.dispose();
+      this.interactionIndicator = null;
+    }
+    this.glowLayer.dispose();
   }
 }

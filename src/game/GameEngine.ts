@@ -118,6 +118,7 @@ export class GameEngine {
   }
 
   public dispose(): void {
+    this.interactionSystem?.dispose();
     this.sceneManager?.dispose();
     this.engine.dispose();
   }
