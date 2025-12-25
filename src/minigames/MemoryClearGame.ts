@@ -55,7 +55,7 @@ export class MemoryClearGame {
     title.color = '#C77DFF';
     title.fontSize = 32;
     title.fontWeight = 'bold';
-    title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     title.top = '20px';
     title.height = '50px';
     title.zIndex = 5001;
@@ -76,8 +76,8 @@ export class MemoryClearGame {
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 24;
     this.timerText.fontWeight = 'bold';
-    this.timerText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    this.timerText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.timerText.top = '20px';
     this.timerText.left = '-40px';
     this.timerText.height = '30px';
@@ -89,7 +89,7 @@ export class MemoryClearGame {
     this.statusText.color = '#FFD700';
     this.statusText.fontSize = 20;
     this.statusText.fontWeight = 'bold';
-    this.statusText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.statusText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.statusText.top = '110px';
     this.statusText.height = '30px';
     this.statusText.zIndex = 5001;

@@ -60,8 +60,8 @@ export class PowerLineGame {
     title.color = '#FFD700';
     title.fontSize = 36;
     title.fontWeight = 'bold';
-    title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '20px'; // Moved from 40px
+    title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    title.top = '20px';
     title.height = '60px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
@@ -83,9 +83,9 @@ export class PowerLineGame {
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
-    this.timerText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    this.timerText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '20px'; // Moved from 40px
+    this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.timerText.top = '20px';
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
     this.timerText.zIndex = 5001;
@@ -96,8 +96,8 @@ export class PowerLineGame {
     this.progressText.text = 'Połączenia: 0/5';
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
-    this.progressText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.progressText.top = '130px'; // Moved from 150px
+    this.progressText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.progressText.top = '130px';
     this.progressText.height = '40px';
     this.progressText.zIndex = 5001;
     this.overlay.addControl(this.progressText);

@@ -50,7 +50,7 @@ export class SatelliteTVGame {
     title.color = '#4A9EFF';
     title.fontSize = 36;
     title.fontWeight = 'bold';
-    title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     title.top = '20px';
     title.height = '60px';
     title.zIndex = 5001;
@@ -71,8 +71,8 @@ export class SatelliteTVGame {
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
-    this.timerText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    this.timerText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.timerText.top = '20px';
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
@@ -85,7 +85,7 @@ export class SatelliteTVGame {
     targetText.color = '#FFD700';
     targetText.fontSize = 32;
     targetText.fontWeight = 'bold';
-    targetText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+    targetText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
     targetText.top = '-80px';
     targetText.height = '40px';
     targetText.zIndex = 5001;
@@ -96,7 +96,7 @@ export class SatelliteTVGame {
     this.angleText.text = `Aktualny: ${this.currentAngle}°`;
     this.angleText.color = 'white';
     this.angleText.fontSize = 28;
-    this.angleText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+    this.angleText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
     this.angleText.top = '-30px';
     this.angleText.height = '40px';
     this.angleText.zIndex = 5001;
