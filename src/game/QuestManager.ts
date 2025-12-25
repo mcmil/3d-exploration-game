@@ -200,6 +200,21 @@ export class QuestManager {
   }
 
   /**
+   * Get quest color as CSS string
+   */
+  public getQuestColorString(type: QuestType): string {
+    const color = this.questColors[type];
+    return `rgb(${Math.floor(color.r * 255)}, ${Math.floor(color.g * 255)}, ${Math.floor(color.b * 255)})`;
+  }
+
+  /**
+   * Get all active quests (for minimap initialization)
+   */
+  public getAllQuests(): Quest[] {
+    return this.activeQuests;
+  }
+
+  /**
    * Clean up all markers
    */
   public dispose(): void {

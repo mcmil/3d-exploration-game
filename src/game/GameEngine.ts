@@ -75,6 +75,13 @@ export class GameEngine {
       const progress = this.questManager.getProgress();
       this.hud.updateQuestCount(progress.completed, progress.total);
 
+      // Add quests to minimap
+      const allQuests = this.questManager.getAllQuests();
+      for (const quest of allQuests) {
+        const colorString = this.questManager.getQuestColorString(quest.type);
+        this.hud.addQuestToMinimap(quest.id, quest.position, colorString);
+      }
+
       // Set up interaction button callback
       this.hud.onInteractionButtonClick(() => {
         if (this.interactionSystem && this.questManager && this.hud) {
@@ -148,9 +155,10 @@ export class GameEngine {
           }
         }
 
-        // Update HUD
-        if (this.hud) {
+        // Update HUD and minimap
+        if (this.hud && player) {
           this.hud.update();
+          this.hud.updateMinimapPlayerPosition(player.getPosition());
         }
 
         this.sceneManager.update();
@@ -201,6 +209,9 @@ export class GameEngine {
 
     // Complete the quest
     this.questManager.completeQuest(questId);
+
+    // Remove quest from minimap
+    this.hud.removeQuestFromMinimap(questId);
 
     // Update HUD
     const progress = this.questManager.getProgress();

@@ -1,5 +1,5 @@
-import { AdvancedDynamicTexture, TextBlock, Rectangle, Control, Button } from '@babylonjs/gui';
-import { Scene } from '@babylonjs/core';
+import { AdvancedDynamicTexture, TextBlock, Rectangle, Control, Button, Ellipse } from '@babylonjs/gui';
+import { Scene, Vector3 } from '@babylonjs/core';
 
 export class HUD {
   private advancedTexture: AdvancedDynamicTexture;
@@ -10,6 +10,13 @@ export class HUD {
   private questCounter: TextBlock;
   private interactionPrompt: Rectangle;
   private interactionButton: Button;
+
+  // Minimap
+  private minimapContainer: Rectangle;
+  private playerDot: Ellipse;
+  private questDots: Map<string, Ellipse> = new Map();
+  private readonly worldSize: number = 100; // Match world boundaries
+  private readonly minimapSize: number = 150;
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -23,21 +30,26 @@ export class HUD {
     this.interactionPrompt = this.createInteractionPrompt();
     this.interactionButton = this.createInteractionButton();
 
+    // Create minimap
+    const minimap = this.createMinimap();
+    this.minimapContainer = minimap.container;
+    this.playerDot = minimap.playerDot;
+
     console.log('📊 HUD initialized!');
   }
 
   /**
-   * Create objective text at top of screen
+   * Create objective text at bottom of screen
    */
   private createObjectiveText(): TextBlock {
     const text = new TextBlock('objectiveText');
     text.text = 'Walk to houses with colored markers above them';
     text.color = 'white';
-    text.fontSize = 20;
+    text.fontSize = 18;
     text.fontWeight = 'bold';
     text.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-    text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    text.top = '20px';
+    text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    text.top = '-200px'; // Above the interaction prompt
     text.height = '40px';
     text.shadowColor = 'black';
     text.shadowBlur = 8;
@@ -223,6 +235,94 @@ export class HUD {
       }
       celebration.fontSize = 48 * scale;
     });
+  }
+
+  /**
+   * Create minimap in top right corner
+   */
+  private createMinimap(): { container: Rectangle; playerDot: Ellipse } {
+    // Minimap background
+    const container = new Rectangle('minimapContainer');
+    container.width = `${this.minimapSize}px`;
+    container.height = `${this.minimapSize}px`;
+    container.cornerRadius = 10;
+    container.color = 'white';
+    container.thickness = 3;
+    container.background = 'rgba(0, 0, 0, 0.6)';
+    container.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    container.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    container.top = '70px'; // Below quest counter
+    container.left = '-20px';
+    this.advancedTexture.addControl(container);
+
+    // Minimap title
+    const title = new TextBlock('minimapTitle');
+    title.text = 'MAP';
+    title.color = 'white';
+    title.fontSize = 12;
+    title.fontWeight = 'bold';
+    title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    title.top = '5px';
+    title.height = '15px';
+    container.addControl(title);
+
+    // Player dot (green)
+    const playerDot = new Ellipse('playerDot');
+    playerDot.width = '8px';
+    playerDot.height = '8px';
+    playerDot.color = 'white';
+    playerDot.thickness = 2;
+    playerDot.background = '#00FF00'; // Bright green
+    container.addControl(playerDot);
+
+    return { container, playerDot };
+  }
+
+  /**
+   * Add quest marker to minimap
+   */
+  public addQuestToMinimap(questId: string, position: Vector3, color: string): void {
+    if (this.questDots.has(questId)) return;
+
+    const dot = new Ellipse(`questDot_${questId}`);
+    dot.width = '10px';
+    dot.height = '10px';
+    dot.color = 'white';
+    dot.thickness = 1;
+    dot.background = color;
+
+    // Convert world position to minimap position
+    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.8); // 80% of minimap size
+    const minimapZ = (position.z / this.worldSize) * (this.minimapSize * 0.8);
+
+    dot.left = `${minimapX}px`;
+    dot.top = `${minimapZ + 15}px`; // Offset for title
+
+    this.minimapContainer.addControl(dot);
+    this.questDots.set(questId, dot);
+  }
+
+  /**
+   * Remove quest marker from minimap
+   */
+  public removeQuestFromMinimap(questId: string): void {
+    const dot = this.questDots.get(questId);
+    if (dot) {
+      this.minimapContainer.removeControl(dot);
+      this.questDots.delete(questId);
+    }
+  }
+
+  /**
+   * Update player position on minimap
+   */
+  public updateMinimapPlayerPosition(position: Vector3): void {
+    // Convert world position to minimap position
+    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.8);
+    const minimapZ = (position.z / this.worldSize) * (this.minimapSize * 0.8);
+
+    this.playerDot.left = `${minimapX}px`;
+    this.playerDot.top = `${minimapZ + 15}px`; // Offset for title
   }
 
   /**
