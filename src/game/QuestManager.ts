@@ -133,10 +133,28 @@ export class QuestManager {
   }
 
   /**
-   * Get quest at specific house
+   * Get quest at specific house position (position-based matching)
+   */
+  public getQuestAtPosition(position: Vector3, threshold: number = 5.0): Quest | null {
+    for (const quest of this.activeQuests) {
+      if (quest.completed) continue;
+
+      const dx = position.x - quest.position.x;
+      const dz = position.z - quest.position.z;
+      const distance = Math.sqrt(dx * dx + dz * dz);
+
+      if (distance < threshold) {
+        return quest;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get quest at specific house (legacy - uses position matching)
    */
   public getQuestAtHouse(houseMesh: Mesh): Quest | null {
-    return this.activeQuests.find(q => q.houseMesh === houseMesh && !q.completed) || null;
+    return this.getQuestAtPosition(houseMesh.position, 5.0);
   }
 
   /**

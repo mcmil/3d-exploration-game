@@ -45,12 +45,12 @@ export class HUD {
     const text = new TextBlock('objectiveText');
     text.text = 'Walk to houses with colored markers above them';
     text.color = 'white';
-    text.fontSize = 18;
+    text.fontSize = 16;
     text.fontWeight = 'bold';
     text.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    text.top = '-200px'; // Above the interaction prompt
-    text.height = '40px';
+    text.top = '-240px'; // Well above interaction prompt to avoid covering player
+    text.height = '30px';
     text.shadowColor = 'black';
     text.shadowBlur = 8;
     text.shadowOffsetX = 2;
@@ -285,15 +285,16 @@ export class HUD {
     if (this.questDots.has(questId)) return;
 
     const dot = new Ellipse(`questDot_${questId}`);
-    dot.width = '10px';
-    dot.height = '10px';
+    dot.width = '12px';
+    dot.height = '12px';
     dot.color = 'white';
-    dot.thickness = 1;
+    dot.thickness = 2;
     dot.background = color;
 
     // Convert world position to minimap position
-    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.8); // 80% of minimap size
-    const minimapZ = (position.z / this.worldSize) * (this.minimapSize * 0.8);
+    // World: -100 to +100, Minimap: -60 to +60 (centered)
+    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.4);
+    const minimapZ = -(position.z / this.worldSize) * (this.minimapSize * 0.4); // Negate Z for correct orientation
 
     dot.left = `${minimapX}px`;
     dot.top = `${minimapZ + 15}px`; // Offset for title
@@ -318,8 +319,9 @@ export class HUD {
    */
   public updateMinimapPlayerPosition(position: Vector3): void {
     // Convert world position to minimap position
-    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.8);
-    const minimapZ = (position.z / this.worldSize) * (this.minimapSize * 0.8);
+    // World: -100 to +100, Minimap: -60 to +60 (centered)
+    const minimapX = (position.x / this.worldSize) * (this.minimapSize * 0.4);
+    const minimapZ = -(position.z / this.worldSize) * (this.minimapSize * 0.4); // Negate Z for correct orientation
 
     this.playerDot.left = `${minimapX}px`;
     this.playerDot.top = `${minimapZ + 15}px`; // Offset for title
