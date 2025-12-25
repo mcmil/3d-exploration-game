@@ -85,8 +85,12 @@ export class GameEngine {
 
       // Set up interaction button callback
       this.hud.onInteractionButtonClick(() => {
+        console.log('🎯 Button clicked! Current quest:', this.currentQuest);
         if (this.currentQuest && this.questManager) {
+          console.log('🎮 Starting mini-game for quest:', this.currentQuest.type);
           this.startMiniGame(this.currentQuest.type, this.currentQuest.id);
+        } else {
+          console.log('❌ No current quest available');
         }
       });
     }

@@ -21,8 +21,9 @@ export class HUD {
   constructor(scene: Scene) {
     this.scene = scene;
 
-    // Create fullscreen UI texture
+    // Create fullscreen UI texture with pointer blocking enabled
     this.advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI', true, scene);
+    this.advancedTexture.renderAtIdealSize = true;
 
     // Initialize UI elements
     this.objectiveText = this.createObjectiveText();
@@ -88,20 +89,21 @@ export class HUD {
    */
   private createInteractionPrompt(): Rectangle {
     const promptBg = new Rectangle('interactionPromptBg');
-    promptBg.width = '400px';
-    promptBg.height = '80px';
+    promptBg.width = '280px';
+    promptBg.height = '50px';
     promptBg.cornerRadius = 10;
     promptBg.color = 'white';
-    promptBg.thickness = 3;
-    promptBg.background = 'rgba(0, 0, 0, 0.7)';
+    promptBg.thickness = 2;
+    promptBg.background = 'rgba(0, 0, 0, 0.75)';
     promptBg.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    promptBg.top = '-120px';
+    promptBg.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    promptBg.top = '-110px'; // Above the button
     promptBg.isVisible = false; // Hidden by default
 
     const promptText = new TextBlock('interactionPromptText');
-    promptText.text = 'Tap the button to interact';
+    promptText.text = 'Tap the button below';
     promptText.color = 'white';
-    promptText.fontSize = 18;
+    promptText.fontSize = 16;
     promptText.fontWeight = 'bold';
 
     promptBg.addControl(promptText);
@@ -115,23 +117,37 @@ export class HUD {
    */
   private createInteractionButton(): Button {
     const button = Button.CreateSimpleButton('interactionButton', 'FIX PROBLEM');
-    button.width = '200px';
-    button.height = '80px';
+    button.width = '220px';
+    button.height = '70px';
     button.color = 'white';
     button.background = '#00AA00'; // Green
-    button.fontSize = 24;
+    button.fontSize = 22;
     button.fontWeight = 'bold';
-    button.cornerRadius = 10;
+    button.cornerRadius = 12;
     button.thickness = 4;
     button.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER; // Center to avoid joystick overlap
     button.top = '-30px';
-    button.left = '-30px';
     button.isVisible = false; // Hidden by default
     button.shadowColor = 'black';
     button.shadowBlur = 10;
+    button.zIndex = 1000; // Ensure it's above joysticks
 
-    // Hover effects
+    // Enable pointer events to work above joysticks
+    button.isPointerBlocker = true;
+
+    // Visual feedback on touch
+    button.onPointerDownObservable.add(() => {
+      button.background = '#008800';
+      console.log('🔘 Button pressed!');
+    });
+
+    button.onPointerUpObservable.add(() => {
+      button.background = '#00AA00';
+      console.log('🔘 Button released!');
+    });
+
+    // Hover effects (for desktop)
     button.onPointerEnterObservable.add(() => {
       button.background = '#00CC00';
     });
@@ -168,19 +184,18 @@ export class HUD {
    * Show interaction prompt and button
    */
   public showInteractionPrompt(questType: string): void {
-    this.interactionPrompt.isVisible = true;
+    // Only show button, not the prompt background (to avoid "two buttons" look)
+    this.interactionPrompt.isVisible = false; // Hide the black box
     this.interactionButton.isVisible = true;
 
-    // Update prompt text based on quest type
-    const promptText = this.interactionPrompt.children[0] as TextBlock;
+    // Update button text based on quest type
     const questNames: { [key: string]: string } = {
-      power_outage: 'Fix Power Outage',
-      satellite_tv: 'Fix Satellite TV',
-      device_repair: 'Repair Device',
-      memory_clear: 'Clear Memory'
+      power_outage: 'FIX POWER',
+      satellite_tv: 'FIX SATELLITE',
+      device_repair: 'REPAIR DEVICE',
+      memory_clear: 'CLEAR MEMORY'
     };
 
-    promptText.text = questNames[questType] || 'Fix Problem';
     this.interactionButton.textBlock!.text = questNames[questType] || 'FIX PROBLEM';
   }
 
