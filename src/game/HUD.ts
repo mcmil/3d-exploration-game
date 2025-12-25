@@ -44,7 +44,7 @@ export class HUD {
    */
   private createObjectiveText(): TextBlock {
     const text = new TextBlock('objectiveText');
-    text.text = 'Walk to houses with colored markers above them';
+    text.text = 'Idź do domów z kolorowymi znacznikami nad nimi';
     text.color = 'white';
     text.fontSize = 14;
     text.fontWeight = 'bold';
@@ -66,7 +66,7 @@ export class HUD {
    */
   private createQuestCounter(): TextBlock {
     const counter = new TextBlock('questCounter');
-    counter.text = 'Tasks: 0/0';
+    counter.text = 'Zadania: 0/0';
     counter.color = '#FFD700'; // Gold
     counter.fontSize = 24;
     counter.fontWeight = 'bold';
@@ -101,7 +101,7 @@ export class HUD {
     promptBg.isVisible = false; // Hidden by default
 
     const promptText = new TextBlock('interactionPromptText');
-    promptText.text = 'Tap the button below';
+    promptText.text = 'Dotknij przycisk poniżej';
     promptText.color = 'white';
     promptText.fontSize = 16;
     promptText.fontWeight = 'bold';
@@ -116,7 +116,7 @@ export class HUD {
    * Create interaction button (shown when near house)
    */
   private createInteractionButton(): Button {
-    const button = Button.CreateSimpleButton('interactionButton', 'FIX PROBLEM');
+    const button = Button.CreateSimpleButton('interactionButton', 'NAPRAW PROBLEM');
     button.width = '220px';
     button.height = '70px';
     button.color = 'white';
@@ -170,7 +170,7 @@ export class HUD {
    * Update quest counter
    */
   public updateQuestCount(completed: number, total: number): void {
-    this.questCounter.text = `Tasks: ${completed}/${total}`;
+    this.questCounter.text = `Zadania: ${completed}/${total}`;
 
     // Change color based on progress
     if (completed === total && total > 0) {
@@ -190,13 +190,13 @@ export class HUD {
 
     // Update button text based on quest type
     const questNames: { [key: string]: string } = {
-      power_outage: 'FIX POWER',
-      satellite_tv: 'FIX SATELLITE',
-      device_repair: 'REPAIR DEVICE',
-      memory_clear: 'CLEAR MEMORY'
+      power_outage: 'NAPRAW PRĄD',
+      satellite_tv: 'NAPRAW SATELITĘ',
+      device_repair: 'NAPRAW URZĄDZENIE',
+      memory_clear: 'WYCZYŚĆ PAMIĘĆ'
     };
 
-    this.interactionButton.textBlock!.text = questNames[questType] || 'FIX PROBLEM';
+    this.interactionButton.textBlock!.text = questNames[questType] || 'NAPRAW PROBLEM';
   }
 
   /**
@@ -219,12 +219,12 @@ export class HUD {
    * Show completion message
    */
   public showCompletionMessage(totalTime?: number): void {
-    this.updateObjective('🎉 All tasks completed! Great job!');
+    this.updateObjective('🎉 Wszystkie zadania ukończone! Świetna robota!');
     this.hideInteractionPrompt();
 
     // Create celebration text
     const celebration = new TextBlock('celebration');
-    celebration.text = 'YOU WIN! 🎄';
+    celebration.text = 'WYGRAŁEŚ! 🎄';
     celebration.color = '#FFD700';
     celebration.fontSize = 48;
     celebration.fontWeight = 'bold';
@@ -243,7 +243,7 @@ export class HUD {
       const timeText = new TextBlock('timeText');
       const minutes = Math.floor(totalTime / 60);
       const seconds = totalTime % 60;
-      timeText.text = `Total Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      timeText.text = `Całkowity czas: ${minutes}:${seconds.toString().padStart(2, '0')}`;
       timeText.color = '#FFD700';
       timeText.fontSize = 32;
       timeText.fontWeight = 'bold';
@@ -293,7 +293,7 @@ export class HUD {
 
     // Minimap title
     const title = new TextBlock('minimapTitle');
-    title.text = 'MAP';
+    title.text = 'MAPA';
     title.color = 'white';
     title.fontSize = 12;
     title.fontWeight = 'bold';

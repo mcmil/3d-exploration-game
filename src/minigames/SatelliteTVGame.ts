@@ -46,7 +46,7 @@ export class SatelliteTVGame {
     this.overlay.addControl(background);
 
     const title = new TextBlock('title');
-    title.text = '📡 ALIGN SATELLITE DISH 📡';
+    title.text = '📡 DOSTOSUJ ANTENĘ SATELITARNĄ 📡';
     title.color = '#4A9EFF';
     title.fontSize = 36;
     title.fontWeight = 'bold';
@@ -57,17 +57,17 @@ export class SatelliteTVGame {
     this.overlay.addControl(title);
 
     const instructions = new TextBlock('instructions');
-    instructions.text = 'Slide to match the target angle (±5°)';
+    instructions.text = 'Przesuń, aby dopasować kąt docelowy (±5°)';
     instructions.color = 'white';
     instructions.fontSize = 18;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '80px';
+    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    instructions.top = '-20px';
     instructions.height = '40px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     this.timerText = new TextBlock('timer');
-    this.timerText.text = `Time: ${this.timeRemaining}s`;
+    this.timerText.text = `Czas: ${this.timeRemaining}s`;
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
@@ -81,7 +81,7 @@ export class SatelliteTVGame {
 
     // Target angle display
     const targetText = new TextBlock('targetText');
-    targetText.text = `Target: ${this.targetAngle}°`;
+    targetText.text = `Cel: ${this.targetAngle}°`;
     targetText.color = '#FFD700';
     targetText.fontSize = 32;
     targetText.fontWeight = 'bold';
@@ -93,7 +93,7 @@ export class SatelliteTVGame {
 
     // Current angle display
     this.angleText = new TextBlock('angleText');
-    this.angleText.text = `Current: ${this.currentAngle}°`;
+    this.angleText.text = `Aktualny: ${this.currentAngle}°`;
     this.angleText.color = 'white';
     this.angleText.fontSize = 28;
     this.angleText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -121,7 +121,7 @@ export class SatelliteTVGame {
     this.slider.onValueChangedObservable.add((value) => {
       this.currentAngle = Math.round(value);
       if (this.angleText) {
-        this.angleText.text = `Current: ${this.currentAngle}°`;
+        this.angleText.text = `Aktualny: ${this.currentAngle}°`;
 
         // Check if aligned
         const diff = Math.abs(this.currentAngle - this.targetAngle);
@@ -148,7 +148,7 @@ export class SatelliteTVGame {
     submitBtn.zIndex = 5002;
 
     const submitText = new TextBlock('submitText');
-    submitText.text = 'CONFIRM';
+    submitText.text = 'POTWIERDŹ';
     submitText.color = 'white';
     submitText.fontSize = 24;
     submitText.fontWeight = 'bold';
@@ -204,7 +204,7 @@ export class SatelliteTVGame {
       this.timeRemaining--;
 
       if (this.timerText) {
-        this.timerText.text = `Time: ${this.timeRemaining}s`;
+        this.timerText.text = `Czas: ${this.timeRemaining}s`;
         if (this.timeRemaining <= 5) {
           this.timerText.color = '#FF0000';
         } else if (this.timeRemaining <= 10) {
@@ -229,7 +229,7 @@ export class SatelliteTVGame {
 
     if (this.overlay) {
       const successMsg = new TextBlock('successMsg');
-      successMsg.text = '✅ SIGNAL LOCKED!';
+      successMsg.text = '✅ SYGNAŁ ZABLOKOWANY!';
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
@@ -257,7 +257,7 @@ export class SatelliteTVGame {
 
     if (this.overlay) {
       const failMsg = new TextBlock('failMsg');
-      failMsg.text = '❌ TIME UP! TRY AGAIN';
+      failMsg.text = '❌ KONIEC CZASU! SPRÓBUJ PONOWNIE';
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';

@@ -59,7 +59,7 @@ export class DeviceRepairGame {
     this.overlay.addControl(background);
 
     const title = new TextBlock('title');
-    title.text = '🔧 DIAGNOSE & REPAIR 🔧';
+    title.text = '🔧 DIAGNOZUJ I NAPRAW 🔧';
     title.color = '#FFD700';
     title.fontSize = 36;
     title.fontWeight = 'bold';
@@ -70,17 +70,17 @@ export class DeviceRepairGame {
     this.overlay.addControl(title);
 
     const instructions = new TextBlock('instructions');
-    instructions.text = 'Find and tap the 3 broken components (red)';
+    instructions.text = 'Znajdź i dotknij 3 uszkodzone komponenty (czerwone)';
     instructions.color = 'white';
     instructions.fontSize = 18;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '80px';
+    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    instructions.top = '-20px';
     instructions.height = '40px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     this.timerText = new TextBlock('timer');
-    this.timerText.text = `Time: ${this.timeRemaining}s`;
+    this.timerText.text = `Czas: ${this.timeRemaining}s`;
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
@@ -93,7 +93,7 @@ export class DeviceRepairGame {
     this.overlay.addControl(this.timerText);
 
     this.progressText = new TextBlock('progress');
-    this.progressText.text = 'Fixed: 0/3';
+    this.progressText.text = 'Naprawione: 0/3';
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
     this.progressText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -178,7 +178,7 @@ export class DeviceRepairGame {
       this.fixedCount++;
 
       if (this.progressText) {
-        this.progressText.text = `Fixed: ${this.fixedCount}/3`;
+        this.progressText.text = `Naprawione: ${this.fixedCount}/3`;
       }
 
       console.log(`✅ Fixed ${part.name}!`);
@@ -203,7 +203,7 @@ export class DeviceRepairGame {
       this.timeRemaining--;
 
       if (this.timerText) {
-        this.timerText.text = `Time: ${this.timeRemaining}s`;
+        this.timerText.text = `Czas: ${this.timeRemaining}s`;
         if (this.timeRemaining <= 5) {
           this.timerText.color = '#FF0000';
         } else if (this.timeRemaining <= 10) {
@@ -228,7 +228,7 @@ export class DeviceRepairGame {
 
     if (this.overlay) {
       const successMsg = new TextBlock('successMsg');
-      successMsg.text = '✅ DEVICE REPAIRED!';
+      successMsg.text = '✅ URZĄDZENIE NAPRAWIONE!';
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
@@ -256,7 +256,7 @@ export class DeviceRepairGame {
 
     if (this.overlay) {
       const failMsg = new TextBlock('failMsg');
-      failMsg.text = '❌ TIME UP! TRY AGAIN';
+      failMsg.text = '❌ KONIEC CZASU! SPRÓBUJ PONOWNIE';
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';

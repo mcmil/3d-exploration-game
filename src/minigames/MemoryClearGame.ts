@@ -51,7 +51,7 @@ export class MemoryClearGame {
     this.overlay.addControl(background);
 
     const title = new TextBlock('title');
-    title.text = '💾 MEMORY SEQUENCE 💾';
+    title.text = '💾 SEKWENCJA PAMIĘCI 💾';
     title.color = '#C77DFF';
     title.fontSize = 32;
     title.fontWeight = 'bold';
@@ -62,17 +62,17 @@ export class MemoryClearGame {
     this.overlay.addControl(title);
 
     const instructions = new TextBlock('instructions');
-    instructions.text = 'Watch the sequence, then repeat it!';
+    instructions.text = 'Obserwuj sekwencję, potem powtórz!';
     instructions.color = 'white';
     instructions.fontSize = 16;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '75px';
+    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    instructions.top = '-20px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     this.timerText = new TextBlock('timer');
-    this.timerText.text = `Time: ${this.timeRemaining}s`;
+    this.timerText.text = `Czas: ${this.timeRemaining}s`;
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 24;
     this.timerText.fontWeight = 'bold';
@@ -85,7 +85,7 @@ export class MemoryClearGame {
     this.overlay.addControl(this.timerText);
 
     this.statusText = new TextBlock('status');
-    this.statusText.text = 'Watch carefully...';
+    this.statusText.text = 'Obserwuj uważnie...';
     this.statusText.color = '#FFD700';
     this.statusText.fontSize = 20;
     this.statusText.fontWeight = 'bold';
@@ -163,7 +163,7 @@ export class MemoryClearGame {
     this.showingSequence = true;
 
     if (this.statusText) {
-      this.statusText.text = 'Watch carefully...';
+      this.statusText.text = 'Obserwuj uważnie...';
     }
 
     for (let i = 0; i < this.sequence.length; i++) {
@@ -189,7 +189,7 @@ export class MemoryClearGame {
     });
 
     if (this.statusText) {
-      this.statusText.text = 'Now repeat the sequence!';
+      this.statusText.text = 'Teraz powtórz sekwencję!';
     }
   }
 
@@ -220,7 +220,7 @@ export class MemoryClearGame {
       this.onSuccess();
     } else {
       if (this.statusText) {
-        this.statusText.text = `Progress: ${this.playerSequence.length}/${this.sequence.length}`;
+        this.statusText.text = `Postęp: ${this.playerSequence.length}/${this.sequence.length}`;
       }
     }
   }
@@ -229,7 +229,7 @@ export class MemoryClearGame {
     console.log('❌ Wrong sequence!');
 
     if (this.statusText) {
-      this.statusText.text = '❌ WRONG! Try again...';
+      this.statusText.text = '❌ ŹLE! Spróbuj ponownie...';
       this.statusText.color = '#FF0000';
     }
 
@@ -257,7 +257,7 @@ export class MemoryClearGame {
       this.timeRemaining--;
 
       if (this.timerText) {
-        this.timerText.text = `Time: ${this.timeRemaining}s`;
+        this.timerText.text = `Czas: ${this.timeRemaining}s`;
         if (this.timeRemaining <= 5) {
           this.timerText.color = '#FF0000';
         } else if (this.timeRemaining <= 10) {
@@ -282,7 +282,7 @@ export class MemoryClearGame {
 
     if (this.overlay) {
       const successMsg = new TextBlock('successMsg');
-      successMsg.text = '✅ MEMORY CLEARED!';
+      successMsg.text = '✅ PAMIĘĆ WYCZYSZCZONA!';
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
@@ -310,7 +310,7 @@ export class MemoryClearGame {
 
     if (this.overlay) {
       const failMsg = new TextBlock('failMsg');
-      failMsg.text = '❌ TIME UP! TRY AGAIN';
+      failMsg.text = '❌ KONIEC CZASU! SPRÓBUJ PONOWNIE';
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';

@@ -56,7 +56,7 @@ export class PowerLineGame {
 
     // Create title - moved higher
     const title = new TextBlock('title');
-    title.text = '⚡ FIX POWER LINE ⚡';
+    title.text = '⚡ NAPRAW LINIĘ ELEKTRYCZNĄ ⚡';
     title.color = '#FFD700';
     title.fontSize = 36;
     title.fontWeight = 'bold';
@@ -66,20 +66,20 @@ export class PowerLineGame {
     title.zIndex = 5001;
     this.overlay.addControl(title);
 
-    // Create instructions - moved higher
+    // Create instructions - at bottom
     const instructions = new TextBlock('instructions');
-    instructions.text = 'Tap the connections in order: 1 → 2 → 3 → 4 → 5';
+    instructions.text = 'Dotknij połączenia po kolei: 1 → 2 → 3 → 4 → 5';
     instructions.color = 'white';
     instructions.fontSize = 18;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '80px'; // Moved from 100px
+    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    instructions.top = '-20px';
     instructions.height = '40px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     // Create timer
     this.timerText = new TextBlock('timer');
-    this.timerText.text = `Time: ${this.timeRemaining}s`;
+    this.timerText.text = `Czas: ${this.timeRemaining}s`;
     this.timerText.color = '#00FF00';
     this.timerText.fontSize = 28;
     this.timerText.fontWeight = 'bold';
@@ -93,7 +93,7 @@ export class PowerLineGame {
 
     // Create progress text
     this.progressText = new TextBlock('progress');
-    this.progressText.text = 'Connections: 0/5';
+    this.progressText.text = 'Połączenia: 0/5';
     this.progressText.color = 'white';
     this.progressText.fontSize = 24;
     this.progressText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -201,7 +201,7 @@ export class PowerLineGame {
 
       // Update progress
       if (this.progressText) {
-        this.progressText.text = `Connections: ${this.currentIndex}/5`;
+        this.progressText.text = `Połączenia: ${this.currentIndex}/5`;
       }
 
       // Play success sound (visual feedback for now)
@@ -231,7 +231,7 @@ export class PowerLineGame {
       this.timeRemaining--;
 
       if (this.timerText) {
-        this.timerText.text = `Time: ${this.timeRemaining}s`;
+        this.timerText.text = `Czas: ${this.timeRemaining}s`;
 
         // Change color as time runs out
         if (this.timeRemaining <= 5) {
@@ -264,7 +264,7 @@ export class PowerLineGame {
     // Show success message
     if (this.overlay) {
       const successMsg = new TextBlock('successMsg');
-      successMsg.text = '✅ POWER RESTORED!';
+      successMsg.text = '✅ ZASILANIE PRZYWRÓCONE!';
       successMsg.color = '#00FF00';
       successMsg.fontSize = 48;
       successMsg.fontWeight = 'bold';
@@ -298,7 +298,7 @@ export class PowerLineGame {
     // Show failure message
     if (this.overlay) {
       const failMsg = new TextBlock('failMsg');
-      failMsg.text = '❌ TIME UP! TRY AGAIN';
+      failMsg.text = '❌ KONIEC CZASU! SPRÓBUJ PONOWNIE';
       failMsg.color = '#FF0000';
       failMsg.fontSize = 48;
       failMsg.fontWeight = 'bold';
