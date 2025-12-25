@@ -597,6 +597,9 @@ export class WorldGenerator {
       const billboard = new Mesh('paprykarzBillboard', this.scene);
       billboard.position = pos;
 
+      // Rotate to face player/camera at (0, 0, 0)
+      billboard.rotation.y = Math.atan2(-pos.x, -pos.z);
+
       // Support posts
       [-1, 1].forEach((side) => {
         const post = MeshBuilder.CreateCylinder(
@@ -660,6 +663,10 @@ export class WorldGenerator {
     const billboard = new Mesh('nowogardCoaBillboard', this.scene);
     billboard.position.set(-mapSize * 0.25, 0, mapSize * 0.35);
 
+    // Rotate to face player/camera at (0, 0, 0)
+    // Direction from billboard to player: (0.25*mapSize, 0, -0.35*mapSize)
+    billboard.rotation.y = Math.atan2(0.25, -0.35);
+
     // Support posts
     [-1, 1].forEach((side) => {
       const post = MeshBuilder.CreateCylinder(
@@ -675,119 +682,119 @@ export class WorldGenerator {
       post.material = postMat;
     });
 
-    // Billboard base plate
+    // Billboard base plate (LARGER)
     const plate = MeshBuilder.CreateBox(
       'coaBillboardPlate',
-      { width: 4, height: 4.5, depth: 0.15 },
+      { width: 6, height: 6.5, depth: 0.15 },
       this.scene
     );
-    plate.position.y = 3.5;
+    plate.position.y = 4;
     plate.parent = billboard;
 
     const plateMat = new StandardMaterial('coaBillboardPlateMat', this.scene);
     plateMat.diffuseColor = new Color3(0.2, 0.2, 0.25);
     plate.material = plateMat;
 
-    // Create authentic Nowogard coat of arms (LARGE AND VISIBLE)
+    // Create authentic Nowogard coat of arms (EXTREMELY LARGE AND VISIBLE)
     const shieldBase = MeshBuilder.CreatePlane(
       'coatOfArmsBase',
-      { width: 3.2, height: 4.0 },
+      { width: 5.0, height: 6.0 },
       this.scene
     );
-    shieldBase.position.set(0, 3.5, 0.1);
+    shieldBase.position.set(0, 4, 0.1);
     shieldBase.parent = billboard;
 
     const baseMat = new StandardMaterial('coaBaseMat', this.scene);
-    baseMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White/silver
-    baseMat.emissiveColor = new Color3(0.3, 0.3, 0.3); // Strong glow
+    baseMat.diffuseColor = new Color3(1, 1, 1); // Pure white
+    baseMat.emissiveColor = new Color3(0.6, 0.6, 0.6); // VERY strong glow
     shieldBase.material = baseMat;
 
-    // Blue square in top left with griffin
+    // Blue square in top left with griffin (LARGER)
     const blueSquare = MeshBuilder.CreatePlane(
       'blueSquare',
-      { width: 1.4, height: 1.6 },
+      { width: 2.2, height: 2.5 },
       this.scene
     );
-    blueSquare.position.set(-0.75, 4.5, 0.11);
+    blueSquare.position.set(-1.2, 5.2, 0.11);
     blueSquare.parent = billboard;
 
     const blueMat = new StandardMaterial('blueMat', this.scene);
-    blueMat.diffuseColor = new Color3(0.2, 0.4, 0.7); // Heraldic blue
-    blueMat.emissiveColor = new Color3(0.1, 0.2, 0.35); // Strong blue glow
+    blueMat.diffuseColor = new Color3(0.2, 0.5, 0.9); // Bright heraldic blue
+    blueMat.emissiveColor = new Color3(0.3, 0.5, 0.8); // VERY strong blue glow
     blueSquare.material = blueMat;
 
-    // Yellow griffin on blue square
+    // Yellow griffin on blue square (LARGER)
     const griffin = MeshBuilder.CreatePlane(
       'griffin',
-      { width: 1.05, height: 1.3 },
+      { width: 1.65, height: 2.0 },
       this.scene
     );
-    griffin.position.set(-0.75, 4.5, 0.12);
+    griffin.position.set(-1.2, 5.2, 0.12);
     griffin.parent = billboard;
 
     const griffinMat = new StandardMaterial('griffinMat', this.scene);
-    griffinMat.diffuseColor = new Color3(1, 0.9, 0.1); // Yellow/gold
-    griffinMat.emissiveColor = new Color3(0.5, 0.45, 0); // Very strong gold glow
+    griffinMat.diffuseColor = new Color3(1, 1, 0.2); // Bright yellow/gold
+    griffinMat.emissiveColor = new Color3(0.8, 0.8, 0); // EXTREMELY strong gold glow
     griffin.material = griffinMat;
 
-    // Blue fleur-de-lis scattered on white background
+    // Blue fleur-de-lis scattered on white background (LARGER)
     const fleurPositions = [
-      [-1.0, 1.5], [0.35, 2.0], [1.1, 1.2],
-      [-1.0, 0.2], [0.5, 0.3], [1.2, -0.2],
-      [-0.7, -1.0], [0.6, -1.2]
+      [-1.5, 2.0], [0.5, 2.5], [1.6, 1.5],
+      [-1.5, 0.3], [0.7, 0.4], [1.8, -0.3],
+      [-1.0, -1.5], [0.9, -1.8]
     ];
 
     fleurPositions.forEach((pos) => {
       const fleur = MeshBuilder.CreatePlane(
         'fleur',
-        { width: 0.35, height: 0.45 },
+        { width: 0.55, height: 0.7 },
         this.scene
       );
-      fleur.position.set(pos[0], 3.5 + pos[1], 0.11);
+      fleur.position.set(pos[0], 4 + pos[1], 0.11);
       fleur.parent = billboard;
       fleur.material = blueMat;
     });
 
-    // Red brick gate at bottom
+    // Red brick gate at bottom (LARGER)
     const gate = MeshBuilder.CreatePlane(
       'gate',
-      { width: 2.8, height: 1.5 },
+      { width: 4.3, height: 2.3 },
       this.scene
     );
-    gate.position.set(0, 2.25, 0.11);
+    gate.position.set(0, 2.15, 0.11);
     gate.parent = billboard;
 
     const gateMat = new StandardMaterial('gateMat', this.scene);
-    gateMat.diffuseColor = new Color3(0.75, 0.15, 0.1); // Red brick
-    gateMat.emissiveColor = new Color3(0.2, 0.03, 0.02); // Red glow
+    gateMat.diffuseColor = new Color3(0.85, 0.2, 0.15); // Bright red brick
+    gateMat.emissiveColor = new Color3(0.4, 0.1, 0.05); // Strong red glow
     gate.material = gateMat;
 
-    // Gate tower (centered)
+    // Gate tower (centered) (LARGER)
     const tower = MeshBuilder.CreatePlane(
       'tower',
-      { width: 1.2, height: 1.3 },
+      { width: 1.9, height: 2.0 },
       this.scene
     );
-    tower.position.set(0, 2.35, 0.12);
+    tower.position.set(0, 2.3, 0.12);
     tower.parent = billboard;
 
     const towerMat = new StandardMaterial('towerMat', this.scene);
-    towerMat.diffuseColor = new Color3(0.8, 0.2, 0.15); // Brighter red for tower
-    towerMat.emissiveColor = new Color3(0.25, 0.05, 0.03); // Strong red glow
+    towerMat.diffuseColor = new Color3(0.9, 0.3, 0.2); // Very bright red for tower
+    towerMat.emissiveColor = new Color3(0.5, 0.15, 0.1); // VERY strong red glow
     tower.material = towerMat;
 
-    // White archway on tower
+    // White archway on tower (LARGER)
     const arch = MeshBuilder.CreatePlane(
       'arch',
-      { width: 0.75, height: 0.85 },
+      { width: 1.2, height: 1.3 },
       this.scene
     );
-    arch.position.set(0, 1.75, 0.13);
+    arch.position.set(0, 1.65, 0.13);
     arch.parent = billboard;
 
     const archMat = new StandardMaterial('archMat', this.scene);
-    archMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White
-    archMat.emissiveColor = new Color3(0.3, 0.3, 0.3); // White glow
+    archMat.diffuseColor = new Color3(1, 1, 1); // Pure white
+    archMat.emissiveColor = new Color3(0.6, 0.6, 0.6); // VERY strong white glow
     arch.material = archMat;
   }
 
@@ -795,6 +802,10 @@ export class WorldGenerator {
     // Create Lidl store building
     const lidlParent = new Mesh('lidlStore', this.scene);
     lidlParent.position.set(mapSize * 0.2, 0, -mapSize * 0.3);
+
+    // Rotate to face player spawn at (0, 0, 0)
+    // Direction from Lidl to player: (-0.2*mapSize, 0, 0.3*mapSize)
+    lidlParent.rotation.y = Math.atan2(-0.2, 0.3);
 
     // Main building body (large rectangular store)
     const building = MeshBuilder.CreateBox(
