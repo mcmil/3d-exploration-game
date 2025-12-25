@@ -16,6 +16,14 @@ export class PlayerController {
   private readonly worldSize: number = 100; // World is 200x200, so ±100 from origin
   private readonly playerRadius: number = 0.6; // Collision radius
 
+  // Store eye components to prevent disposal
+  private eyeMaterial: StandardMaterial | null = null;
+  private pupilMaterial: StandardMaterial | null = null;
+  private leftEye: Mesh | null = null;
+  private rightEye: Mesh | null = null;
+  private leftPupil: Mesh | null = null;
+  private rightPupil: Mesh | null = null;
+
   constructor(scene: Scene) {
     this.scene = scene;
   }
@@ -74,51 +82,51 @@ export class PlayerController {
     pompomMat.emissiveColor = new Color3(0.5, 0.5, 0.5); // Glowing white
     pompom.material = pompomMat;
 
-    // Eyes (two spheres) - positioned at the front
-    const eyeMat = new StandardMaterial('eyeMat', this.scene);
-    eyeMat.diffuseColor = new Color3(1, 1, 1); // White
-    eyeMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
+    // Eyes (two spheres) - positioned at the front - store as instance variables
+    this.eyeMaterial = new StandardMaterial('eyeMat', this.scene);
+    this.eyeMaterial.diffuseColor = new Color3(1, 1, 1); // White
+    this.eyeMaterial.emissiveColor = new Color3(0.5, 0.5, 0.5);
 
-    const leftEye = MeshBuilder.CreateSphere(
+    this.leftEye = MeshBuilder.CreateSphere(
       'leftEye',
       { diameter: 0.15 },
       this.scene
     );
-    leftEye.position.set(-0.15, 0.3, 0.45); // Left side, front
-    leftEye.parent = this.playerMesh;
-    leftEye.material = eyeMat;
+    this.leftEye.position.set(-0.15, 0.3, 0.45); // Left side, front
+    this.leftEye.parent = this.playerMesh;
+    this.leftEye.material = this.eyeMaterial;
 
-    const rightEye = MeshBuilder.CreateSphere(
+    this.rightEye = MeshBuilder.CreateSphere(
       'rightEye',
       { diameter: 0.15 },
       this.scene
     );
-    rightEye.position.set(0.15, 0.3, 0.45); // Right side, front
-    rightEye.parent = this.playerMesh;
-    rightEye.material = eyeMat;
+    this.rightEye.position.set(0.15, 0.3, 0.45); // Right side, front
+    this.rightEye.parent = this.playerMesh;
+    this.rightEye.material = this.eyeMaterial;
 
-    // Pupils (smaller black spheres)
-    const pupilMat = new StandardMaterial('pupilMat', this.scene);
-    pupilMat.diffuseColor = new Color3(0, 0, 0);
-    pupilMat.emissiveColor = new Color3(0, 0, 0);
+    // Pupils (smaller black spheres) - store as instance variables
+    this.pupilMaterial = new StandardMaterial('pupilMat', this.scene);
+    this.pupilMaterial.diffuseColor = new Color3(0, 0, 0);
+    this.pupilMaterial.emissiveColor = new Color3(0, 0, 0);
 
-    const leftPupil = MeshBuilder.CreateSphere(
+    this.leftPupil = MeshBuilder.CreateSphere(
       'leftPupil',
       { diameter: 0.08 },
       this.scene
     );
-    leftPupil.position.set(-0.15, 0.3, 0.52); // In front of eye
-    leftPupil.parent = this.playerMesh;
-    leftPupil.material = pupilMat;
+    this.leftPupil.position.set(-0.15, 0.3, 0.52); // In front of eye
+    this.leftPupil.parent = this.playerMesh;
+    this.leftPupil.material = this.pupilMaterial;
 
-    const rightPupil = MeshBuilder.CreateSphere(
+    this.rightPupil = MeshBuilder.CreateSphere(
       'rightPupil',
       { diameter: 0.08 },
       this.scene
     );
-    rightPupil.position.set(0.15, 0.3, 0.52); // In front of eye
-    rightPupil.parent = this.playerMesh;
-    rightPupil.material = pupilMat;
+    this.rightPupil.position.set(0.15, 0.3, 0.52); // In front of eye
+    this.rightPupil.parent = this.playerMesh;
+    this.rightPupil.material = this.pupilMaterial;
 
     console.log('🚶 Player created at spawn point with directional indicators');
   }

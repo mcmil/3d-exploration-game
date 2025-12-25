@@ -262,41 +262,102 @@ export class HouseBuilder {
   }
 
   private addCoatOfArms(parent: Mesh, _width: number, height: number, depth: number): void {
-    // Create Nowogard coat of arms on front wall
-    const coatOfArms = MeshBuilder.CreatePlane(
-      'coatOfArms',
-      { width: 1.2, height: 1.5 },
+    // Create authentic Nowogard coat of arms on front wall
+    const shieldBase = MeshBuilder.CreatePlane(
+      'coatOfArmsBase',
+      { width: 1.4, height: 1.8 },
       this.scene
     );
-    coatOfArms.position.set(0, height * 0.6, depth / 2 + 0.02);
-    coatOfArms.parent = parent;
+    shieldBase.position.set(0, height * 0.6, depth / 2 + 0.02);
+    shieldBase.parent = parent;
 
-    const coaMat = new StandardMaterial('coaMat', this.scene);
-    // Shield with gold and red (traditional heraldic colors)
-    coaMat.diffuseColor = new Color3(0.8, 0.6, 0.1); // Gold
-    coaMat.emissiveColor = new Color3(0.2, 0.15, 0);
-    coatOfArms.material = coaMat;
+    // White/silver background
+    const baseMat = new StandardMaterial('coaBaseMat', this.scene);
+    baseMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White/silver
+    shieldBase.material = baseMat;
 
-    // Add red cross detail on shield
-    const crossH = MeshBuilder.CreatePlane(
-      'crossH',
-      { width: 0.8, height: 0.15 },
+    // Blue square in top left with griffin
+    const blueSquare = MeshBuilder.CreatePlane(
+      'blueSquare',
+      { width: 0.6, height: 0.7 },
       this.scene
     );
-    crossH.position.set(0, height * 0.6, depth / 2 + 0.03);
-    crossH.parent = parent;
+    blueSquare.position.set(-0.3, height * 0.6 + 0.45, depth / 2 + 0.03);
+    blueSquare.parent = parent;
 
-    const crossV = MeshBuilder.CreatePlane(
-      'crossV',
-      { width: 0.15, height: 1.0 },
+    const blueMat = new StandardMaterial('blueMat', this.scene);
+    blueMat.diffuseColor = new Color3(0.2, 0.4, 0.7); // Heraldic blue
+    blueSquare.material = blueMat;
+
+    // Yellow griffin on blue square
+    const griffin = MeshBuilder.CreatePlane(
+      'griffin',
+      { width: 0.45, height: 0.55 },
       this.scene
     );
-    crossV.position.set(0, height * 0.6, depth / 2 + 0.03);
-    crossV.parent = parent;
+    griffin.position.set(-0.3, height * 0.6 + 0.45, depth / 2 + 0.04);
+    griffin.parent = parent;
 
-    const crossMat = new StandardMaterial('crossMat', this.scene);
-    crossMat.diffuseColor = new Color3(0.8, 0.1, 0.1); // Red
-    crossH.material = crossMat;
-    crossV.material = crossMat;
+    const griffinMat = new StandardMaterial('griffinMat', this.scene);
+    griffinMat.diffuseColor = new Color3(1, 0.9, 0.1); // Yellow/gold
+    griffinMat.emissiveColor = new Color3(0.3, 0.27, 0);
+    griffin.material = griffinMat;
+
+    // Blue fleur-de-lis scattered on white background (simplified as circles)
+    const fleurPositions = [
+      [-0.5, 0.25], [0.15, 0.4], [0.45, 0.2],
+      [-0.5, -0.1], [0.2, -0.05], [0.5, -0.2],
+      [-0.35, -0.45], [0.25, -0.5]
+    ];
+
+    fleurPositions.forEach((pos) => {
+      const fleur = MeshBuilder.CreatePlane(
+        'fleur',
+        { width: 0.15, height: 0.2 },
+        this.scene
+      );
+      fleur.position.set(pos[0], height * 0.6 + pos[1], depth / 2 + 0.03);
+      fleur.parent = parent;
+      fleur.material = blueMat;
+    });
+
+    // Red brick gate at bottom
+    const gate = MeshBuilder.CreatePlane(
+      'gate',
+      { width: 1.2, height: 0.65 },
+      this.scene
+    );
+    gate.position.set(0, height * 0.6 - 0.57, depth / 2 + 0.03);
+    gate.parent = parent;
+
+    const gateMat = new StandardMaterial('gateMat', this.scene);
+    gateMat.diffuseColor = new Color3(0.75, 0.15, 0.1); // Red brick
+    gate.material = gateMat;
+
+    // Gate tower (centered)
+    const tower = MeshBuilder.CreatePlane(
+      'tower',
+      { width: 0.5, height: 0.55 },
+      this.scene
+    );
+    tower.position.set(0, height * 0.6 - 0.52, depth / 2 + 0.04);
+    tower.parent = parent;
+
+    const towerMat = new StandardMaterial('towerMat', this.scene);
+    towerMat.diffuseColor = new Color3(0.8, 0.2, 0.15); // Brighter red for tower
+    tower.material = towerMat;
+
+    // White archway on tower
+    const arch = MeshBuilder.CreatePlane(
+      'arch',
+      { width: 0.3, height: 0.35 },
+      this.scene
+    );
+    arch.position.set(0, height * 0.6 - 0.65, depth / 2 + 0.05);
+    arch.parent = parent;
+
+    const archMat = new StandardMaterial('archMat', this.scene);
+    archMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White
+    arch.material = archMat;
   }
 }
