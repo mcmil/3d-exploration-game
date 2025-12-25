@@ -16,9 +16,13 @@ export class GameEngine {
   private hud: HUD | null = null;
   private currentMiniGame: PowerLineGame | null = null;
   private currentQuest: any = null; // Store current nearby quest
+  private htmlButton: HTMLButtonElement; // HTML button outside canvas
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
+
+    // Get HTML button element
+    this.htmlButton = document.getElementById('interactionButton') as HTMLButtonElement;
 
     // Create engine with mobile-optimized settings
     this.engine = new Engine(canvas, true, {
@@ -83,9 +87,9 @@ export class GameEngine {
         this.hud.addQuestToMinimap(quest.id, quest.position, colorString);
       }
 
-      // Set up interaction button callback
-      this.hud.onInteractionButtonClick(() => {
-        console.log('🎯 Button clicked! Current quest:', this.currentQuest);
+      // Set up HTML button click handler (bypasses joystick completely)
+      this.htmlButton.addEventListener('click', () => {
+        console.log('🎯 HTML Button clicked! Current quest:', this.currentQuest);
         if (this.currentQuest && this.questManager) {
           console.log('🎮 Starting mini-game for quest:', this.currentQuest.type);
           this.startMiniGame(this.currentQuest.type, this.currentQuest.id);
@@ -93,38 +97,6 @@ export class GameEngine {
           console.log('❌ No current quest available');
         }
       });
-
-      // Add manual touch detection for button area (joystick bypass)
-      this.canvas.addEventListener('touchstart', (event: TouchEvent) => {
-        if (!this.currentQuest || !this.hud) return;
-
-        const touch = event.touches[0];
-        const rect = this.canvas.getBoundingClientRect();
-        const touchX = touch.clientX - rect.left;
-        const touchY = touch.clientY - rect.top;
-
-        // Button is centered horizontally, 30px from bottom, 220px wide, 70px tall
-        const buttonWidth = 220;
-        const buttonHeight = 70;
-        const buttonBottom = 30;
-        const buttonCenterX = rect.width / 2;
-        const buttonLeft = buttonCenterX - buttonWidth / 2;
-        const buttonRight = buttonCenterX + buttonWidth / 2;
-        const buttonTop = rect.height - buttonBottom - buttonHeight;
-        const buttonBottomY = rect.height - buttonBottom;
-
-        // Check if touch is within button bounds
-        if (touchX >= buttonLeft && touchX <= buttonRight &&
-            touchY >= buttonTop && touchY <= buttonBottomY) {
-          console.log('🎯 Touch detected in button area!', { touchX, touchY, buttonLeft, buttonRight, buttonTop, buttonBottomY });
-          event.preventDefault(); // Prevent joystick from capturing
-          event.stopPropagation();
-
-          if (this.questManager) {
-            this.startMiniGame(this.currentQuest.type, this.currentQuest.id);
-          }
-        }
-      }, { passive: false });
     }
 
     // Start render loop
@@ -170,20 +142,27 @@ export class GameEngine {
         if (this.interactionSystem) {
           this.interactionSystem.update();
 
-          // Check if player is near any quest (bypassing house mesh matching)
-          if (this.hud && this.questManager && player) {
+          // Check if player is near any quest and update HTML button
+          if (this.questManager && player) {
             const playerPos = player.getPosition();
             const nearestQuest = this.questManager.getNearestQuest(playerPos);
 
-            // Show prompt if within interaction range
+            // Show/hide HTML button based on proximity (7.0 units)
             if (nearestQuest && nearestQuest.distance < 7.0) {
-              this.hud.showInteractionPrompt(nearestQuest.type);
+              this.currentQuest = nearestQuest;
+              this.htmlButton.classList.add('visible');
 
-              // Store current quest for interaction button
-              (this as any).currentQuest = nearestQuest;
+              // Update button text with quest type
+              const questNames: { [key: string]: string } = {
+                power_outage: 'FIX POWER ⚡',
+                satellite_tv: 'FIX SATELLITE 📡',
+                device_repair: 'REPAIR DEVICE 🔧',
+                memory_clear: 'CLEAR MEMORY 💾'
+              };
+              this.htmlButton.textContent = questNames[nearestQuest.type] || 'FIX PROBLEM';
             } else {
-              this.hud.hideInteractionPrompt();
-              (this as any).currentQuest = null;
+              this.currentQuest = null;
+              this.htmlButton.classList.remove('visible');
             }
           }
         }

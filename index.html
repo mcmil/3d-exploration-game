@@ -175,6 +175,38 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
+
+    /* Interaction button - HTML element outside canvas */
+    #interactionButton {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 70px;
+      background: #00AA00;
+      color: white;
+      border: 4px solid white;
+      border-radius: 12px;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      display: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.1s;
+    }
+
+    #interactionButton:active {
+      background: #008800;
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    #interactionButton.visible {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -195,6 +227,9 @@
   </div>
 
   <canvas id="renderCanvas"></canvas>
+
+  <!-- Interaction button (HTML element, not canvas GUI) -->
+  <button id="interactionButton">FIX PROBLEM</button>
 
   <script type="module" src="/src/main.ts"></script>
 </body>
