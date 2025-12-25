@@ -15,6 +15,7 @@ export class GameEngine {
   private questManager: QuestManager | null = null;
   private hud: HUD | null = null;
   private currentMiniGame: PowerLineGame | null = null;
+  private currentQuest: any = null; // Store current nearby quest
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -84,14 +85,8 @@ export class GameEngine {
 
       // Set up interaction button callback
       this.hud.onInteractionButtonClick(() => {
-        if (this.interactionSystem && this.questManager && this.hud) {
-          const currentHouse = this.interactionSystem.getCurrentInteractable();
-          if (currentHouse) {
-            const quest = this.questManager.getQuestAtHouse(currentHouse.mesh);
-            if (quest) {
-              this.startMiniGame(quest.type, quest.id);
-            }
-          }
+        if (this.currentQuest && this.questManager) {
+          this.startMiniGame(this.currentQuest.type, this.currentQuest.id);
         }
       });
     }
@@ -139,18 +134,20 @@ export class GameEngine {
         if (this.interactionSystem) {
           this.interactionSystem.update();
 
-          // Update HUD based on interaction state
-          if (this.hud && this.questManager) {
-            const currentHouse = this.interactionSystem.getCurrentInteractable();
-            if (currentHouse) {
-              const quest = this.questManager.getQuestAtHouse(currentHouse.mesh);
-              if (quest) {
-                this.hud.showInteractionPrompt(quest.type);
-              } else {
-                this.hud.hideInteractionPrompt();
-              }
+          // Check if player is near any quest (bypassing house mesh matching)
+          if (this.hud && this.questManager && player) {
+            const playerPos = player.getPosition();
+            const nearestQuest = this.questManager.getNearestQuest(playerPos);
+
+            // Show prompt if within interaction range
+            if (nearestQuest && nearestQuest.distance < 7.0) {
+              this.hud.showInteractionPrompt(nearestQuest.type);
+
+              // Store current quest for interaction button
+              (this as any).currentQuest = nearestQuest;
             } else {
               this.hud.hideInteractionPrompt();
+              (this as any).currentQuest = null;
             }
           }
         }

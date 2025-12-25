@@ -160,8 +160,8 @@ export class QuestManager {
   /**
    * Get nearest active quest to player position
    */
-  public getNearestQuest(playerPos: Vector3): Quest | null {
-    let nearest: Quest | null = null;
+  public getNearestQuest(playerPos: Vector3): (Quest & { distance: number }) | null {
+    let nearest: (Quest & { distance: number }) | null = null;
     let nearestDistance = Infinity;
 
     for (const quest of this.activeQuests) {
@@ -173,7 +173,7 @@ export class QuestManager {
 
       if (distance < nearestDistance) {
         nearestDistance = distance;
-        nearest = quest;
+        nearest = { ...quest, distance };
       }
     }
 
