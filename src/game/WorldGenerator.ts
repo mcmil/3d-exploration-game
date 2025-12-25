@@ -54,6 +54,11 @@ export class WorldGenerator {
 
     // Add detailed repair van at spawn point
     this.createRepairVan();
+
+    // Add Polish regional themes
+    this.addNowogardCitySign(config.mapSize);
+    this.addBosmanBottles(config.mapSize);
+    this.addPaprykarzAds(config.mapSize);
   }
 
   private createSnowGround(size: number): void {
@@ -114,12 +119,16 @@ export class WorldGenerator {
         const size = sizes[Math.floor(Math.random() * sizes.length)];
         const hasDish = Math.random() > 0.5; // 50% chance
         const hasLights = Math.random() > 0.7; // 30% chance
+        const hasGraffiti = Math.random() > 0.7; // 30% chance for graffiti
+        const hasCoatOfArms = Math.random() > 0.8; // 20% chance for coat of arms
 
         const houseConfig: HouseConfig = {
           position: new Vector3(x, 0, z),
           size,
           hasSatelliteDish: hasDish,
           hasChristmasLights: hasLights,
+          hasGraffiti: hasGraffiti,
+          hasCoatOfArms: hasCoatOfArms,
         };
 
         const house = this.houseBuilder.createHouse(houseConfig);
@@ -448,6 +457,198 @@ export class WorldGenerator {
     const toolBoxMat = new StandardMaterial('toolBoxMat', this.scene);
     toolBoxMat.diffuseColor = new Color3(0.6, 0.6, 0.6);
     toolBox.material = toolBoxMat;
+  }
+
+  private addNowogardCitySign(mapSize: number): void {
+    // Create Polish green city limit sign
+    const signParent = new Mesh('nowogardSign', this.scene);
+    signParent.position.set(mapSize * 0.35, 0, mapSize * 0.35);
+
+    // Sign post
+    const post = MeshBuilder.CreateCylinder(
+      'signPost',
+      { diameter: 0.15, height: 3 },
+      this.scene
+    );
+    post.position.y = 1.5;
+    post.parent = signParent;
+
+    const postMat = new StandardMaterial('signPostMat', this.scene);
+    postMat.diffuseColor = new Color3(0.4, 0.4, 0.4);
+    post.material = postMat;
+
+    // Green sign plate (Polish standard)
+    const signPlate = MeshBuilder.CreateBox(
+      'signPlate',
+      { width: 3.5, height: 1.2, depth: 0.1 },
+      this.scene
+    );
+    signPlate.position.y = 2.8;
+    signPlate.parent = signParent;
+
+    const signMat = new StandardMaterial('signMat', this.scene);
+    signMat.diffuseColor = new Color3(0, 0.5, 0.1); // Polish green road sign
+    signPlate.material = signMat;
+
+    // White text area
+    const textPlate = MeshBuilder.CreatePlane(
+      'textPlate',
+      { width: 3.2, height: 0.9 },
+      this.scene
+    );
+    textPlate.position.set(0, 2.8, 0.06);
+    textPlate.parent = signParent;
+
+    const textMat = new StandardMaterial('textMat', this.scene);
+    textMat.diffuseColor = new Color3(1, 1, 1);
+    textPlate.material = textMat;
+
+    // City name border (black line)
+    const borderTop = MeshBuilder.CreatePlane(
+      'border',
+      { width: 3.0, height: 0.05 },
+      this.scene
+    );
+    borderTop.position.set(0, 3.15, 0.07);
+    borderTop.parent = signParent;
+
+    const borderBot = MeshBuilder.CreatePlane(
+      'border',
+      { width: 3.0, height: 0.05 },
+      this.scene
+    );
+    borderBot.position.set(0, 2.45, 0.07);
+    borderBot.parent = signParent;
+
+    const borderMat = new StandardMaterial('borderMat', this.scene);
+    borderMat.diffuseColor = new Color3(0, 0, 0);
+    borderTop.material = borderMat;
+    borderBot.material = borderMat;
+  }
+
+  private addBosmanBottles(mapSize: number): void {
+    // Add 5-8 Bosman beer bottles scattered around
+    const numBottles = 5 + Math.floor(Math.random() * 4);
+
+    const bottleMat = new StandardMaterial('bottleMat', this.scene);
+    bottleMat.diffuseColor = new Color3(0.3, 0.15, 0.05); // Brown glass
+    bottleMat.alpha = 0.7;
+    bottleMat.specularColor = new Color3(0.5, 0.5, 0.5);
+
+    const capMat = new StandardMaterial('capMat', this.scene);
+    capMat.diffuseColor = new Color3(0.8, 0.6, 0.1); // Gold cap
+
+    for (let i = 0; i < numBottles; i++) {
+      const x = (Math.random() - 0.5) * mapSize * 0.6;
+      const z = (Math.random() - 0.5) * mapSize * 0.6;
+
+      // Bottle body
+      const bottle = MeshBuilder.CreateCylinder(
+        'bosmanBottle',
+        { diameterTop: 0.15, diameterBottom: 0.2, height: 0.8 },
+        this.scene
+      );
+      bottle.position.set(x, 0.1, z);
+      bottle.rotation.set(
+        Math.random() * Math.PI / 4,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI / 3
+      );
+      bottle.material = bottleMat;
+
+      // Bottle cap
+      const cap = MeshBuilder.CreateCylinder(
+        'cap',
+        { diameter: 0.16, height: 0.1 },
+        this.scene
+      );
+      cap.position.y = 0.45;
+      cap.parent = bottle;
+      cap.material = capMat;
+
+      // Label (red/white Bosman colors)
+      const label = MeshBuilder.CreateCylinder(
+        'label',
+        { diameter: 0.21, height: 0.3 },
+        this.scene
+      );
+      label.position.y = 0;
+      label.parent = bottle;
+
+      const labelMat = new StandardMaterial('labelMat', this.scene);
+      labelMat.diffuseColor = new Color3(0.9, 0.1, 0.1); // Red label
+      label.material = labelMat;
+    }
+  }
+
+  private addPaprykarzAds(mapSize: number): void {
+    // Add 2-3 Paprykarz Szczeciński billboards
+    const positions = [
+      new Vector3(-mapSize * 0.3, 0, -mapSize * 0.3),
+      new Vector3(mapSize * 0.3, 0, -mapSize * 0.25),
+      new Vector3(-mapSize * 0.25, 0, mapSize * 0.3),
+    ];
+
+    positions.forEach((pos) => {
+      const billboard = new Mesh('paprykarzBillboard', this.scene);
+      billboard.position = pos;
+
+      // Support posts
+      [-1, 1].forEach((side) => {
+        const post = MeshBuilder.CreateCylinder(
+          'billboardPost',
+          { diameter: 0.2, height: 4 },
+          this.scene
+        );
+        post.position.set(side * 1.5, 2, 0);
+        post.parent = billboard;
+
+        const postMat = new StandardMaterial('billboardPostMat', this.scene);
+        postMat.diffuseColor = new Color3(0.3, 0.3, 0.3);
+        post.material = postMat;
+      });
+
+      // Billboard plate
+      const plate = MeshBuilder.CreateBox(
+        'billboardPlate',
+        { width: 3.5, height: 2, depth: 0.1 },
+        this.scene
+      );
+      plate.position.y = 3;
+      plate.parent = billboard;
+
+      const plateMat = new StandardMaterial('billboardPlateMat', this.scene);
+      plateMat.diffuseColor = new Color3(1, 0.95, 0.85); // Cream background
+      plate.material = plateMat;
+
+      // Paprykarz can graphic (orange/red)
+      const canGraphic = MeshBuilder.CreateCylinder(
+        'canGraphic',
+        { diameter: 1.2, height: 0.15 },
+        this.scene
+      );
+      canGraphic.position.set(0, 3.3, 0.06);
+      canGraphic.rotation.x = Math.PI / 2;
+      canGraphic.parent = billboard;
+
+      const canMat = new StandardMaterial('canMat', this.scene);
+      canMat.diffuseColor = new Color3(1, 0.4, 0.1); // Orange can
+      canMat.emissiveColor = new Color3(0.3, 0.1, 0);
+      canGraphic.material = canMat;
+
+      // Red stripe (brand color)
+      const stripe = MeshBuilder.CreateBox(
+        'stripe',
+        { width: 3.3, height: 0.4, depth: 0.12 },
+        this.scene
+      );
+      stripe.position.set(0, 2.5, 0.06);
+      stripe.parent = billboard;
+
+      const stripeMat = new StandardMaterial('stripeMat', this.scene);
+      stripeMat.diffuseColor = new Color3(0.9, 0.1, 0.1); // Red brand stripe
+      stripe.material = stripeMat;
+    });
   }
 
   public getHouses(): Mesh[] {

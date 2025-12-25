@@ -14,6 +14,8 @@ export interface HouseConfig {
   wallColor?: Color3;
   hasSatelliteDish?: boolean;
   hasChristmasLights?: boolean;
+  hasGraffiti?: boolean;
+  hasCoatOfArms?: boolean;
 }
 
 export class HouseBuilder {
@@ -128,6 +130,16 @@ export class HouseBuilder {
       this.addChristmasLights(parent, width, height, depth);
     }
 
+    // Add graffiti if specified
+    if (config.hasGraffiti) {
+      this.addGraffiti(parent, width, height, depth);
+    }
+
+    // Add coat of arms if specified
+    if (config.hasCoatOfArms) {
+      this.addCoatOfArms(parent, width, height, depth);
+    }
+
     return parent;
   }
 
@@ -229,5 +241,62 @@ export class HouseBuilder {
       lightMat.emissiveColor = colors[i % colors.length].scale(0.5);
       light.material = lightMat;
     }
+  }
+
+  private addGraffiti(parent: Mesh, width: number, height: number, _depth: number): void {
+    // Create "POMORZANIN PANY" graffiti on side wall
+    const graffiti = MeshBuilder.CreatePlane(
+      'graffiti',
+      { width: width * 0.8, height: 0.8 },
+      this.scene
+    );
+    graffiti.position.set(width / 2 + 0.02, height * 0.5, 0);
+    graffiti.rotation.y = -Math.PI / 2;
+    graffiti.parent = parent;
+
+    const graffitiMat = new StandardMaterial('graffitiMat', this.scene);
+    // Spray paint style - bright colors
+    graffitiMat.diffuseColor = new Color3(1, 0.2, 0.2); // Red spray paint
+    graffitiMat.emissiveColor = new Color3(0.3, 0, 0);
+    graffiti.material = graffitiMat;
+  }
+
+  private addCoatOfArms(parent: Mesh, _width: number, height: number, depth: number): void {
+    // Create Nowogard coat of arms on front wall
+    const coatOfArms = MeshBuilder.CreatePlane(
+      'coatOfArms',
+      { width: 1.2, height: 1.5 },
+      this.scene
+    );
+    coatOfArms.position.set(0, height * 0.6, depth / 2 + 0.02);
+    coatOfArms.parent = parent;
+
+    const coaMat = new StandardMaterial('coaMat', this.scene);
+    // Shield with gold and red (traditional heraldic colors)
+    coaMat.diffuseColor = new Color3(0.8, 0.6, 0.1); // Gold
+    coaMat.emissiveColor = new Color3(0.2, 0.15, 0);
+    coatOfArms.material = coaMat;
+
+    // Add red cross detail on shield
+    const crossH = MeshBuilder.CreatePlane(
+      'crossH',
+      { width: 0.8, height: 0.15 },
+      this.scene
+    );
+    crossH.position.set(0, height * 0.6, depth / 2 + 0.03);
+    crossH.parent = parent;
+
+    const crossV = MeshBuilder.CreatePlane(
+      'crossV',
+      { width: 0.15, height: 1.0 },
+      this.scene
+    );
+    crossV.position.set(0, height * 0.6, depth / 2 + 0.03);
+    crossV.parent = parent;
+
+    const crossMat = new StandardMaterial('crossMat', this.scene);
+    crossMat.diffuseColor = new Color3(0.8, 0.1, 0.1); // Red
+    crossH.material = crossMat;
+    crossV.material = crossMat;
   }
 }
