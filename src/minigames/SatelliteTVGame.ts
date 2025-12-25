@@ -60,8 +60,8 @@ export class SatelliteTVGame {
     instructions.text = 'Przesuń, aby dopasować kąt docelowy (±5°)';
     instructions.color = 'white';
     instructions.fontSize = 14;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    instructions.top = '-10px';
+    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    instructions.top = '85px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
