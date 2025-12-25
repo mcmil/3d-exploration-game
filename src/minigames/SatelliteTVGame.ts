@@ -51,7 +51,7 @@ export class SatelliteTVGame {
     title.fontSize = 36;
     title.fontWeight = 'bold';
     title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '40px';
+    title.top = '60px';
     title.height = '60px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
@@ -61,7 +61,7 @@ export class SatelliteTVGame {
     instructions.color = 'white';
     instructions.fontSize = 14;
     instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '110px';
+    instructions.top = '150px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
@@ -73,7 +73,7 @@ export class SatelliteTVGame {
     this.timerText.fontWeight = 'bold';
     this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '40px';
+    this.timerText.top = '60px';
     this.timerText.left = '-40px';
     this.timerText.height = '40px';
     this.timerText.zIndex = 5001;

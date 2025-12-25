@@ -56,7 +56,7 @@ export class MemoryClearGame {
     title.fontSize = 32;
     title.fontWeight = 'bold';
     title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    title.top = '40px';
+    title.top = '60px';
     title.height = '50px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
@@ -66,7 +66,7 @@ export class MemoryClearGame {
     instructions.color = 'white';
     instructions.fontSize = 14;
     instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '100px';
+    instructions.top = '140px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
@@ -78,7 +78,7 @@ export class MemoryClearGame {
     this.timerText.fontWeight = 'bold';
     this.timerText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.timerText.top = '40px';
+    this.timerText.top = '60px';
     this.timerText.left = '-40px';
     this.timerText.height = '30px';
     this.timerText.zIndex = 5001;
@@ -90,7 +90,7 @@ export class MemoryClearGame {
     this.statusText.fontSize = 20;
     this.statusText.fontWeight = 'bold';
     this.statusText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.statusText.top = '150px';
+    this.statusText.top = '190px';
     this.statusText.height = '30px';
     this.statusText.zIndex = 5001;
     this.overlay.addControl(this.statusText);
