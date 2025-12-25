@@ -46,12 +46,12 @@ export class HUD {
     const text = new TextBlock('objectiveText');
     text.text = 'Walk to houses with colored markers above them';
     text.color = 'white';
-    text.fontSize = 16;
+    text.fontSize = 14;
     text.fontWeight = 'bold';
     text.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     text.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    text.top = '-240px'; // Well above interaction prompt to avoid covering player
-    text.height = '30px';
+    text.top = '-120px'; // At bottom, above HTML button
+    text.height = '25px';
     text.shadowColor = 'black';
     text.shadowBlur = 8;
     text.shadowOffsetX = 2;
@@ -218,7 +218,7 @@ export class HUD {
   /**
    * Show completion message
    */
-  public showCompletionMessage(): void {
+  public showCompletionMessage(totalTime?: number): void {
     this.updateObjective('🎉 All tasks completed! Great job!');
     this.hideInteractionPrompt();
 
@@ -230,12 +230,33 @@ export class HUD {
     celebration.fontWeight = 'bold';
     celebration.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     celebration.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+    celebration.top = '-40px';
     celebration.shadowColor = 'black';
     celebration.shadowBlur = 15;
     celebration.shadowOffsetX = 3;
     celebration.shadowOffsetY = 3;
 
     this.advancedTexture.addControl(celebration);
+
+    // Add time display if provided
+    if (totalTime !== undefined) {
+      const timeText = new TextBlock('timeText');
+      const minutes = Math.floor(totalTime / 60);
+      const seconds = totalTime % 60;
+      timeText.text = `Total Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      timeText.color = '#FFD700';
+      timeText.fontSize = 32;
+      timeText.fontWeight = 'bold';
+      timeText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+      timeText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+      timeText.top = '40px';
+      timeText.shadowColor = 'black';
+      timeText.shadowBlur = 10;
+      timeText.shadowOffsetX = 2;
+      timeText.shadowOffsetY = 2;
+
+      this.advancedTexture.addControl(timeText);
+    }
 
     // Animate celebration text
     let scale = 0.5;

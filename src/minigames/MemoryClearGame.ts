@@ -53,45 +53,45 @@ export class MemoryClearGame {
     const title = new TextBlock('title');
     title.text = '💾 MEMORY SEQUENCE 💾';
     title.color = '#C77DFF';
-    title.fontSize = 36;
+    title.fontSize = 32;
     title.fontWeight = 'bold';
     title.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     title.top = '20px';
-    title.height = '60px';
+    title.height = '50px';
     title.zIndex = 5001;
     this.overlay.addControl(title);
 
     const instructions = new TextBlock('instructions');
     instructions.text = 'Watch the sequence, then repeat it!';
     instructions.color = 'white';
-    instructions.fontSize = 18;
+    instructions.fontSize = 16;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    instructions.top = '80px';
-    instructions.height = '40px';
+    instructions.top = '75px';
+    instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
 
     this.timerText = new TextBlock('timer');
     this.timerText.text = `Time: ${this.timeRemaining}s`;
     this.timerText.color = '#00FF00';
-    this.timerText.fontSize = 28;
+    this.timerText.fontSize = 24;
     this.timerText.fontWeight = 'bold';
     this.timerText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
     this.timerText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.timerText.top = '20px';
     this.timerText.left = '-40px';
-    this.timerText.height = '40px';
+    this.timerText.height = '30px';
     this.timerText.zIndex = 5001;
     this.overlay.addControl(this.timerText);
 
     this.statusText = new TextBlock('status');
     this.statusText.text = 'Watch carefully...';
     this.statusText.color = '#FFD700';
-    this.statusText.fontSize = 24;
+    this.statusText.fontSize = 20;
     this.statusText.fontWeight = 'bold';
     this.statusText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-    this.statusText.top = '130px';
-    this.statusText.height = '40px';
+    this.statusText.top = '110px';
+    this.statusText.height = '30px';
     this.statusText.zIndex = 5001;
     this.overlay.addControl(this.statusText);
 

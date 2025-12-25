@@ -20,6 +20,8 @@ export class GameEngine {
   private currentMiniGame: PowerLineGame | SatelliteTVGame | DeviceRepairGame | MemoryClearGame | null = null;
   private currentQuest: any = null; // Store current nearby quest
   private htmlButton: HTMLButtonElement; // HTML button outside canvas
+  private gameStartTime: number = 0; // Track game start time
+  private totalGameTime: number = 0; // Total elapsed time in seconds
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -102,6 +104,9 @@ export class GameEngine {
       });
     }
 
+    // Start game timer
+    this.gameStartTime = Date.now();
+
     // Start render loop
     this.engine.runRenderLoop(() => {
       if (this.sceneManager) {
@@ -174,6 +179,9 @@ export class GameEngine {
         if (this.hud && player) {
           this.hud.update();
           this.hud.updateMinimapPlayerPosition(player.getPosition());
+
+          // Update total game time
+          this.totalGameTime = Math.floor((Date.now() - this.gameStartTime) / 1000);
         }
 
         this.sceneManager.update();
@@ -254,7 +262,7 @@ export class GameEngine {
 
     // Check if all quests completed
     if (this.questManager.allQuestsCompleted()) {
-      this.hud.showCompletionMessage();
+      this.hud.showCompletionMessage(this.totalGameTime);
     }
   }
 
