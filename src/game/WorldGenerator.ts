@@ -59,6 +59,10 @@ export class WorldGenerator {
     this.addNowogardCitySign(config.mapSize);
     this.addBosmanBottles(config.mapSize);
     this.addPaprykarzAds(config.mapSize);
+    this.addNowogardCoatOfArmsBillboard(config.mapSize);
+
+    // Add Lidl store
+    this.createLidlStore(config.mapSize);
   }
 
   private createSnowGround(size: number): void {
@@ -121,8 +125,6 @@ export class WorldGenerator {
         const hasLights = Math.random() > 0.7; // 30% chance
         const hasGraffiti = Math.random() > 0.7; // 30% chance for Pomorzanin graffiti
         const hasPaprykarzGraffiti = Math.random() > 0.75; // 25% chance for Paprykarz graffiti
-        // First house always gets coat of arms for visibility, then 40% chance for others
-        const hasCoatOfArms = houseCount === 0 ? true : Math.random() > 0.6; // 40% chance
 
         const houseConfig: HouseConfig = {
           position: new Vector3(x, 0, z),
@@ -131,7 +133,6 @@ export class WorldGenerator {
           hasChristmasLights: hasLights,
           hasGraffiti: hasGraffiti,
           hasPaprykarzGraffiti: hasPaprykarzGraffiti,
-          hasCoatOfArms: hasCoatOfArms,
         };
 
         const house = this.houseBuilder.createHouse(houseConfig);
@@ -652,6 +653,235 @@ export class WorldGenerator {
       stripeMat.diffuseColor = new Color3(0.9, 0.1, 0.1); // Red brand stripe
       stripe.material = stripeMat;
     });
+  }
+
+  private addNowogardCoatOfArmsBillboard(mapSize: number): void {
+    // Create Nowogard coat of arms billboard
+    const billboard = new Mesh('nowogardCoaBillboard', this.scene);
+    billboard.position.set(-mapSize * 0.25, 0, mapSize * 0.35);
+
+    // Support posts
+    [-1, 1].forEach((side) => {
+      const post = MeshBuilder.CreateCylinder(
+        'coaBillboardPost',
+        { diameter: 0.2, height: 5 },
+        this.scene
+      );
+      post.position.set(side * 1.8, 2.5, 0);
+      post.parent = billboard;
+
+      const postMat = new StandardMaterial('coaBillboardPostMat', this.scene);
+      postMat.diffuseColor = new Color3(0.3, 0.3, 0.3);
+      post.material = postMat;
+    });
+
+    // Billboard base plate
+    const plate = MeshBuilder.CreateBox(
+      'coaBillboardPlate',
+      { width: 4, height: 4.5, depth: 0.15 },
+      this.scene
+    );
+    plate.position.y = 3.5;
+    plate.parent = billboard;
+
+    const plateMat = new StandardMaterial('coaBillboardPlateMat', this.scene);
+    plateMat.diffuseColor = new Color3(0.2, 0.2, 0.25);
+    plate.material = plateMat;
+
+    // Create authentic Nowogard coat of arms (LARGE AND VISIBLE)
+    const shieldBase = MeshBuilder.CreatePlane(
+      'coatOfArmsBase',
+      { width: 3.2, height: 4.0 },
+      this.scene
+    );
+    shieldBase.position.set(0, 3.5, 0.1);
+    shieldBase.parent = billboard;
+
+    const baseMat = new StandardMaterial('coaBaseMat', this.scene);
+    baseMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White/silver
+    baseMat.emissiveColor = new Color3(0.3, 0.3, 0.3); // Strong glow
+    shieldBase.material = baseMat;
+
+    // Blue square in top left with griffin
+    const blueSquare = MeshBuilder.CreatePlane(
+      'blueSquare',
+      { width: 1.4, height: 1.6 },
+      this.scene
+    );
+    blueSquare.position.set(-0.75, 4.5, 0.11);
+    blueSquare.parent = billboard;
+
+    const blueMat = new StandardMaterial('blueMat', this.scene);
+    blueMat.diffuseColor = new Color3(0.2, 0.4, 0.7); // Heraldic blue
+    blueMat.emissiveColor = new Color3(0.1, 0.2, 0.35); // Strong blue glow
+    blueSquare.material = blueMat;
+
+    // Yellow griffin on blue square
+    const griffin = MeshBuilder.CreatePlane(
+      'griffin',
+      { width: 1.05, height: 1.3 },
+      this.scene
+    );
+    griffin.position.set(-0.75, 4.5, 0.12);
+    griffin.parent = billboard;
+
+    const griffinMat = new StandardMaterial('griffinMat', this.scene);
+    griffinMat.diffuseColor = new Color3(1, 0.9, 0.1); // Yellow/gold
+    griffinMat.emissiveColor = new Color3(0.5, 0.45, 0); // Very strong gold glow
+    griffin.material = griffinMat;
+
+    // Blue fleur-de-lis scattered on white background
+    const fleurPositions = [
+      [-1.0, 1.5], [0.35, 2.0], [1.1, 1.2],
+      [-1.0, 0.2], [0.5, 0.3], [1.2, -0.2],
+      [-0.7, -1.0], [0.6, -1.2]
+    ];
+
+    fleurPositions.forEach((pos) => {
+      const fleur = MeshBuilder.CreatePlane(
+        'fleur',
+        { width: 0.35, height: 0.45 },
+        this.scene
+      );
+      fleur.position.set(pos[0], 3.5 + pos[1], 0.11);
+      fleur.parent = billboard;
+      fleur.material = blueMat;
+    });
+
+    // Red brick gate at bottom
+    const gate = MeshBuilder.CreatePlane(
+      'gate',
+      { width: 2.8, height: 1.5 },
+      this.scene
+    );
+    gate.position.set(0, 2.25, 0.11);
+    gate.parent = billboard;
+
+    const gateMat = new StandardMaterial('gateMat', this.scene);
+    gateMat.diffuseColor = new Color3(0.75, 0.15, 0.1); // Red brick
+    gateMat.emissiveColor = new Color3(0.2, 0.03, 0.02); // Red glow
+    gate.material = gateMat;
+
+    // Gate tower (centered)
+    const tower = MeshBuilder.CreatePlane(
+      'tower',
+      { width: 1.2, height: 1.3 },
+      this.scene
+    );
+    tower.position.set(0, 2.35, 0.12);
+    tower.parent = billboard;
+
+    const towerMat = new StandardMaterial('towerMat', this.scene);
+    towerMat.diffuseColor = new Color3(0.8, 0.2, 0.15); // Brighter red for tower
+    towerMat.emissiveColor = new Color3(0.25, 0.05, 0.03); // Strong red glow
+    tower.material = towerMat;
+
+    // White archway on tower
+    const arch = MeshBuilder.CreatePlane(
+      'arch',
+      { width: 0.75, height: 0.85 },
+      this.scene
+    );
+    arch.position.set(0, 1.75, 0.13);
+    arch.parent = billboard;
+
+    const archMat = new StandardMaterial('archMat', this.scene);
+    archMat.diffuseColor = new Color3(0.95, 0.95, 0.95); // White
+    archMat.emissiveColor = new Color3(0.3, 0.3, 0.3); // White glow
+    arch.material = archMat;
+  }
+
+  private createLidlStore(mapSize: number): void {
+    // Create Lidl store building
+    const lidlParent = new Mesh('lidlStore', this.scene);
+    lidlParent.position.set(mapSize * 0.2, 0, -mapSize * 0.3);
+
+    // Main building body (large rectangular store)
+    const building = MeshBuilder.CreateBox(
+      'lidlBuilding',
+      { width: 12, height: 4, depth: 8 },
+      this.scene
+    );
+    building.position.y = 2;
+    building.parent = lidlParent;
+    building.checkCollisions = true;
+
+    const buildingMat = new StandardMaterial('lidlBuildingMat', this.scene);
+    buildingMat.diffuseColor = new Color3(0.9, 0.9, 0.9); // Light gray
+    building.material = buildingMat;
+
+    // Lidl sign (blue and yellow)
+    const signBase = MeshBuilder.CreateBox(
+      'lidlSign',
+      { width: 8, height: 2, depth: 0.3 },
+      this.scene
+    );
+    signBase.position.set(0, 4.2, 4.15);
+    signBase.parent = lidlParent;
+
+    const signMat = new StandardMaterial('lidlSignMat', this.scene);
+    signMat.diffuseColor = new Color3(0, 0.3, 0.7); // Lidl blue
+    signMat.emissiveColor = new Color3(0, 0.1, 0.3);
+    signBase.material = signMat;
+
+    // Yellow Lidl text area
+    const signText = MeshBuilder.CreateBox(
+      'lidlSignText',
+      { width: 6, height: 1.2, depth: 0.31 },
+      this.scene
+    );
+    signText.position.set(0, 4.2, 4.16);
+    signText.parent = lidlParent;
+
+    const textMat = new StandardMaterial('lidlTextMat', this.scene);
+    textMat.diffuseColor = new Color3(1, 0.9, 0); // Lidl yellow
+    textMat.emissiveColor = new Color3(0.4, 0.36, 0);
+    signText.material = textMat;
+
+    // Entrance doors (glass-like)
+    const doors = MeshBuilder.CreateBox(
+      'lidlDoors',
+      { width: 3, height: 3, depth: 0.2 },
+      this.scene
+    );
+    doors.position.set(0, 1.5, 4.1);
+    doors.parent = lidlParent;
+
+    const doorMat = new StandardMaterial('lidlDoorMat', this.scene);
+    doorMat.diffuseColor = new Color3(0.5, 0.7, 0.9); // Glass blue
+    doorMat.alpha = 0.6;
+    doors.material = doorMat;
+
+    // Windows on sides
+    [-5, 5].forEach((x) => {
+      const window = MeshBuilder.CreateBox(
+        'lidlWindow',
+        { width: 1.5, height: 2, depth: 0.1 },
+        this.scene
+      );
+      window.position.set(x, 2.5, 0);
+      window.parent = lidlParent;
+
+      const windowMat = new StandardMaterial('lidlWindowMat', this.scene);
+      windowMat.diffuseColor = new Color3(0.6, 0.8, 1.0);
+      windowMat.alpha = 0.7;
+      window.material = windowMat;
+    });
+
+    // Parking lot lines
+    const parkingLineMat = new StandardMaterial('parkingLineMat', this.scene);
+    parkingLineMat.diffuseColor = new Color3(1, 1, 1);
+
+    for (let i = -2; i <= 2; i++) {
+      const line = MeshBuilder.CreateBox(
+        'parkingLine',
+        { width: 0.2, height: 0.05, depth: 3 },
+        this.scene
+      );
+      line.position.set(i * 2.5, 0.05, -6);
+      line.parent = lidlParent;
+      line.material = parkingLineMat;
+    }
   }
 
   public getHouses(): Mesh[] {
