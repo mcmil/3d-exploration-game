@@ -185,27 +185,31 @@ export class PlayerController {
         continue;
       }
 
-      // Skip meshes without positions (like ground)
-      if (!mesh.position || mesh.name === 'ground' || mesh.name === 'snow') {
+      // Skip non-collidable meshes
+      if (!mesh.position || mesh.name === 'ground' || mesh.name === 'snow' ||
+          mesh.name.includes('road') || mesh.name.includes('snowCap')) {
         continue;
       }
 
-      // Check if mesh is a collidable object (houses, trees, boulders)
-      if (mesh.name.includes('house') ||
-          mesh.name.includes('tree') ||
-          mesh.name.includes('boulder') ||
-          mesh.name.includes('pole')) {
+      // Check parent meshes only (exact name matches for main collision objects)
+      if (mesh.name === 'house' ||
+          mesh.name === 'pineTree' ||
+          mesh.name === 'boulder' ||
+          mesh.name === 'powerPole' ||
+          mesh.name === 'repairVan') {
 
         // Simple distance-based collision detection
         const dx = position.x - mesh.position.x;
         const dz = position.z - mesh.position.z;
         const distance = Math.sqrt(dx * dx + dz * dz);
 
-        // Collision radius based on object type
-        let objectRadius = 2.0; // Default for houses
-        if (mesh.name.includes('tree')) objectRadius = 1.5;
-        if (mesh.name.includes('boulder')) objectRadius = 1.5;
-        if (mesh.name.includes('pole')) objectRadius = 0.5;
+        // Collision radius based on object type (increased for better collision)
+        let objectRadius = 3.5; // Default for houses (larger to prevent going through)
+
+        if (mesh.name === 'pineTree') objectRadius = 2.0; // Trees have wider spread
+        if (mesh.name === 'boulder') objectRadius = 1.8; // Boulders are medium-sized
+        if (mesh.name === 'powerPole') objectRadius = 0.8; // Poles are thin
+        if (mesh.name === 'repairVan') objectRadius = 2.5; // Van is fairly large
 
         if (distance < this.playerRadius + objectRadius) {
           return true; // Collision detected
