@@ -59,7 +59,6 @@ export class WorldGenerator {
     this.addNowogardCitySign(config.mapSize);
     this.addBosmanBottles(config.mapSize);
     this.addPaprykarzAds(config.mapSize);
-    this.addNowogardCoatOfArmsBillboard(config.mapSize);
 
     // Add Lidl store
     this.createLidlStore(config.mapSize);
@@ -658,154 +657,15 @@ export class WorldGenerator {
     });
   }
 
-  private addNowogardCoatOfArmsBillboard(mapSize: number): void {
-    // Create Nowogard coat of arms billboard
-    const billboard = new Mesh('nowogardCoaBillboard', this.scene);
-    billboard.position.set(-mapSize * 0.25, 0, mapSize * 0.35);
-
-    // Rotate to face player/camera at (0, 0, 0)
-    // Direction from billboard to player: (0.25*mapSize, 0, -0.35*mapSize)
-    billboard.rotation.y = Math.atan2(0.25, -0.35);
-
-    // Support posts
-    [-1, 1].forEach((side) => {
-      const post = MeshBuilder.CreateCylinder(
-        'coaBillboardPost',
-        { diameter: 0.2, height: 5 },
-        this.scene
-      );
-      post.position.set(side * 1.8, 2.5, 0);
-      post.parent = billboard;
-
-      const postMat = new StandardMaterial('coaBillboardPostMat', this.scene);
-      postMat.diffuseColor = new Color3(0.3, 0.3, 0.3);
-      post.material = postMat;
-    });
-
-    // Billboard base plate (LARGER)
-    const plate = MeshBuilder.CreateBox(
-      'coaBillboardPlate',
-      { width: 6, height: 6.5, depth: 0.15 },
-      this.scene
-    );
-    plate.position.y = 4;
-    plate.parent = billboard;
-
-    const plateMat = new StandardMaterial('coaBillboardPlateMat', this.scene);
-    plateMat.diffuseColor = new Color3(0.2, 0.2, 0.25);
-    plate.material = plateMat;
-
-    // Create authentic Nowogard coat of arms (EXTREMELY LARGE AND VISIBLE)
-    const shieldBase = MeshBuilder.CreatePlane(
-      'coatOfArmsBase',
-      { width: 5.0, height: 6.0 },
-      this.scene
-    );
-    shieldBase.position.set(0, 4, 0.1);
-    shieldBase.parent = billboard;
-
-    const baseMat = new StandardMaterial('coaBaseMat', this.scene);
-    baseMat.diffuseColor = new Color3(1, 1, 1); // Pure white
-    baseMat.emissiveColor = new Color3(0.6, 0.6, 0.6); // VERY strong glow
-    shieldBase.material = baseMat;
-
-    // Blue square in top left with griffin (LARGER)
-    const blueSquare = MeshBuilder.CreatePlane(
-      'blueSquare',
-      { width: 2.2, height: 2.5 },
-      this.scene
-    );
-    blueSquare.position.set(-1.2, 5.2, 0.11);
-    blueSquare.parent = billboard;
-
-    const blueMat = new StandardMaterial('blueMat', this.scene);
-    blueMat.diffuseColor = new Color3(0.2, 0.5, 0.9); // Bright heraldic blue
-    blueMat.emissiveColor = new Color3(0.3, 0.5, 0.8); // VERY strong blue glow
-    blueSquare.material = blueMat;
-
-    // Yellow griffin on blue square (LARGER)
-    const griffin = MeshBuilder.CreatePlane(
-      'griffin',
-      { width: 1.65, height: 2.0 },
-      this.scene
-    );
-    griffin.position.set(-1.2, 5.2, 0.12);
-    griffin.parent = billboard;
-
-    const griffinMat = new StandardMaterial('griffinMat', this.scene);
-    griffinMat.diffuseColor = new Color3(1, 1, 0.2); // Bright yellow/gold
-    griffinMat.emissiveColor = new Color3(0.8, 0.8, 0); // EXTREMELY strong gold glow
-    griffin.material = griffinMat;
-
-    // Blue fleur-de-lis scattered on white background (LARGER)
-    const fleurPositions = [
-      [-1.5, 2.0], [0.5, 2.5], [1.6, 1.5],
-      [-1.5, 0.3], [0.7, 0.4], [1.8, -0.3],
-      [-1.0, -1.5], [0.9, -1.8]
-    ];
-
-    fleurPositions.forEach((pos) => {
-      const fleur = MeshBuilder.CreatePlane(
-        'fleur',
-        { width: 0.55, height: 0.7 },
-        this.scene
-      );
-      fleur.position.set(pos[0], 4 + pos[1], 0.11);
-      fleur.parent = billboard;
-      fleur.material = blueMat;
-    });
-
-    // Red brick gate at bottom (LARGER)
-    const gate = MeshBuilder.CreatePlane(
-      'gate',
-      { width: 4.3, height: 2.3 },
-      this.scene
-    );
-    gate.position.set(0, 2.15, 0.11);
-    gate.parent = billboard;
-
-    const gateMat = new StandardMaterial('gateMat', this.scene);
-    gateMat.diffuseColor = new Color3(0.85, 0.2, 0.15); // Bright red brick
-    gateMat.emissiveColor = new Color3(0.4, 0.1, 0.05); // Strong red glow
-    gate.material = gateMat;
-
-    // Gate tower (centered) (LARGER)
-    const tower = MeshBuilder.CreatePlane(
-      'tower',
-      { width: 1.9, height: 2.0 },
-      this.scene
-    );
-    tower.position.set(0, 2.3, 0.12);
-    tower.parent = billboard;
-
-    const towerMat = new StandardMaterial('towerMat', this.scene);
-    towerMat.diffuseColor = new Color3(0.9, 0.3, 0.2); // Very bright red for tower
-    towerMat.emissiveColor = new Color3(0.5, 0.15, 0.1); // VERY strong red glow
-    tower.material = towerMat;
-
-    // White archway on tower (LARGER)
-    const arch = MeshBuilder.CreatePlane(
-      'arch',
-      { width: 1.2, height: 1.3 },
-      this.scene
-    );
-    arch.position.set(0, 1.65, 0.13);
-    arch.parent = billboard;
-
-    const archMat = new StandardMaterial('archMat', this.scene);
-    archMat.diffuseColor = new Color3(1, 1, 1); // Pure white
-    archMat.emissiveColor = new Color3(0.6, 0.6, 0.6); // VERY strong white glow
-    arch.material = archMat;
-  }
-
   private createLidlStore(mapSize: number): void {
-    // Create Lidl store building
+    // Create Lidl store building - positioned in front of camera view
     const lidlParent = new Mesh('lidlStore', this.scene);
-    lidlParent.position.set(mapSize * 0.2, 0, -mapSize * 0.3);
+    // Place in +X, -Z direction (in front of isometric camera view)
+    lidlParent.position.set(mapSize * 0.25, 0, -mapSize * 0.25);
 
-    // Rotate to face player spawn at (0, 0, 0)
-    // Direction from Lidl to player: (-0.2*mapSize, 0, 0.3*mapSize)
-    lidlParent.rotation.y = Math.atan2(-0.2, 0.3);
+    // Rotate entrance to face player spawn at (0, 0, 0)
+    // Direction from Lidl to player: (-0.25*mapSize, 0, 0.25*mapSize)
+    lidlParent.rotation.y = Math.atan2(-0.25, 0.25);
 
     // Main building body (large rectangular store)
     const building = MeshBuilder.CreateBox(

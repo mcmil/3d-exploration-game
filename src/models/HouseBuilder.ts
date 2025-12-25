@@ -148,24 +148,25 @@ export class HouseBuilder {
   private addWindows(parent: Mesh, width: number, height: number, depth: number): void {
     const windowMat = new StandardMaterial('windowMat', this.scene);
     windowMat.diffuseColor = new Color3(1, 1, 0.5); // Bright warm glow
-    windowMat.emissiveColor = new Color3(0.6, 0.6, 0.2); // Strong glow
+    windowMat.emissiveColor = new Color3(0.8, 0.8, 0.3); // Very strong glow
+    windowMat.backFaceCulling = false; // Visible from both sides
 
-    // Front windows (LARGER AND BRIGHTER)
-    const frontWindow1 = MeshBuilder.CreatePlane(
+    // Front windows - using boxes for better visibility
+    const frontWindow1 = MeshBuilder.CreateBox(
       'window',
-      { width: 1.2, height: 1.4 },
+      { width: 1.2, height: 1.4, depth: 0.1 },
       this.scene
     );
-    frontWindow1.position.set(-width * 0.25, height * 0.4, depth / 2 + 0.01);
+    frontWindow1.position.set(-width * 0.25, height * 0.4, depth / 2 + 0.1);
     frontWindow1.parent = parent;
     frontWindow1.material = windowMat;
 
-    const frontWindow2 = MeshBuilder.CreatePlane(
+    const frontWindow2 = MeshBuilder.CreateBox(
       'window',
-      { width: 1.2, height: 1.4 },
+      { width: 1.2, height: 1.4, depth: 0.1 },
       this.scene
     );
-    frontWindow2.position.set(width * 0.25, height * 0.4, depth / 2 + 0.01);
+    frontWindow2.position.set(width * 0.25, height * 0.4, depth / 2 + 0.1);
     frontWindow2.parent = parent;
     frontWindow2.material = windowMat;
   }
