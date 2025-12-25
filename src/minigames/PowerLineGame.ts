@@ -71,7 +71,7 @@ export class PowerLineGame {
     instructions.text = 'Dotknij połączenia po kolei: 1 → 2 → 3 → 4 → 5';
     instructions.color = 'white';
     instructions.fontSize = 14;
-    instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    instructions.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     instructions.top = '85px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
