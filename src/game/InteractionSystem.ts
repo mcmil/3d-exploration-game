@@ -1,5 +1,6 @@
 import { Scene, Mesh, Vector3, GlowLayer, Color3, MeshBuilder, StandardMaterial } from '@babylonjs/core';
 import { PlayerController } from './PlayerController';
+import { AudioManager } from './AudioManager';
 
 export interface InteractableHouse {
   mesh: Mesh;
@@ -10,14 +11,16 @@ export interface InteractableHouse {
 export class InteractionSystem {
   private scene: Scene;
   private player: PlayerController;
+  private audioManager: AudioManager;
   private readonly interactionRange: number = 4.0; // Distance to interact
   private currentInteractable: InteractableHouse | null = null;
   private glowLayer: GlowLayer;
   private interactionIndicator: Mesh | null = null;
 
-  constructor(scene: Scene, player: PlayerController) {
+  constructor(scene: Scene, player: PlayerController, audioManager: AudioManager) {
     this.scene = scene;
     this.player = player;
+    this.audioManager = audioManager;
 
     // Create glow layer for highlighting interactable houses
     this.glowLayer = new GlowLayer('glow', scene, {
@@ -91,6 +94,10 @@ export class InteractionSystem {
     }
 
     console.log('🔧 Interacting with house at:', this.currentInteractable.position);
+
+    // Play interaction success sound
+    this.audioManager.play('interaction_success');
+
     // This will be connected to mini-games later
     return true;
   }
@@ -100,6 +107,9 @@ export class InteractionSystem {
    */
   private onEnterInteractionRange(house: InteractableHouse): void {
     console.log('✨ Entered interaction range of house at:', house.position);
+
+    // Play bell chime sound
+    this.audioManager.play('interaction_enter');
 
     // Add glow effect to house
     this.glowLayer.addIncludedOnlyMesh(house.mesh);
@@ -140,6 +150,9 @@ export class InteractionSystem {
    */
   private onLeaveInteractionRange(house: InteractableHouse): void {
     console.log('👋 Left interaction range of house at:', house.position);
+
+    // Play soft leave sound
+    this.audioManager.play('interaction_leave');
 
     // Remove glow effect
     this.glowLayer.removeIncludedOnlyMesh(house.mesh);

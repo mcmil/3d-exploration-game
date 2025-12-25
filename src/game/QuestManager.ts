@@ -1,4 +1,5 @@
 import { Scene, Mesh, Vector3, MeshBuilder, StandardMaterial, Color3 } from '@babylonjs/core';
+import { AudioManager } from './AudioManager';
 
 export type QuestType = 'power_outage' | 'satellite_tv' | 'device_repair' | 'memory_clear';
 
@@ -14,6 +15,7 @@ export interface Quest {
 
 export class QuestManager {
   private scene: Scene;
+  private audioManager: AudioManager;
   private activeQuests: Quest[] = [];
   private completedQuestCount: number = 0;
   private questIdCounter: number = 0;
@@ -26,8 +28,9 @@ export class QuestManager {
     memory_clear: new Color3(0.8, 0.2, 1.0)  // Purple
   };
 
-  constructor(scene: Scene) {
+  constructor(scene: Scene, audioManager: AudioManager) {
     this.scene = scene;
+    this.audioManager = audioManager;
   }
 
   /**
@@ -122,11 +125,16 @@ export class QuestManager {
       quest.marker = null;
     }
 
+    // Play quest completion sound
+    this.audioManager.play('quest_complete');
+
     console.log(`✅ Completed ${quest.type} quest! (${this.completedQuestCount}/${this.activeQuests.length})`);
 
     // Check if all quests completed
     if (this.completedQuestCount === this.activeQuests.length) {
       console.log('🎉 All quests completed! Great job!');
+      // Play special completion sound
+      this.audioManager.play('ho_ho_ho');
     }
 
     return true;

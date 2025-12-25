@@ -3,6 +3,7 @@ import { SceneManager } from './SceneManager';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionSystem } from './InteractionSystem';
 import { QuestManager } from './QuestManager';
+import { AudioManager } from './AudioManager';
 import { HUD } from './HUD';
 import { PowerLineGame } from '../minigames/PowerLineGame';
 import { SatelliteTVGame } from '../minigames/SatelliteTVGame';
@@ -14,6 +15,7 @@ export class GameEngine {
   private canvas: HTMLCanvasElement;
   private sceneManager: SceneManager | null = null;
   private joystick: VirtualJoystick | null = null;
+  private audioManager: AudioManager | null = null;
   private interactionSystem: InteractionSystem | null = null;
   private questManager: QuestManager | null = null;
   private hud: HUD | null = null;
@@ -73,11 +75,15 @@ export class GameEngine {
     const player = this.sceneManager.getPlayer();
     const scene = this.sceneManager.getScene();
     if (player && scene) {
-      this.interactionSystem = new InteractionSystem(scene, player);
+      // Initialize audio manager
+      this.audioManager = new AudioManager(scene);
+      console.log('🎵 Audio manager initialized!');
+
+      this.interactionSystem = new InteractionSystem(scene, player, this.audioManager);
       console.log('🔧 Interaction system initialized!');
 
       // Create quest manager and assign random quests
-      this.questManager = new QuestManager(scene);
+      this.questManager = new QuestManager(scene, this.audioManager);
       this.questManager.assignRandomQuests(5); // 5 quests at game start
 
       // Create HUD
