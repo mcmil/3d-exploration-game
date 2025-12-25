@@ -2,6 +2,7 @@ import { Engine, Scene } from '@babylonjs/core';
 import { SceneManager } from './SceneManager';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionSystem } from './InteractionSystem';
+import { QuestManager } from './QuestManager';
 
 export class GameEngine {
   private engine: Engine;
@@ -9,6 +10,7 @@ export class GameEngine {
   private sceneManager: SceneManager | null = null;
   private joystick: VirtualJoystick | null = null;
   private interactionSystem: InteractionSystem | null = null;
+  private questManager: QuestManager | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -59,6 +61,10 @@ export class GameEngine {
     if (player && scene) {
       this.interactionSystem = new InteractionSystem(scene, player);
       console.log('🔧 Interaction system initialized!');
+
+      // Create quest manager and assign random quests
+      this.questManager = new QuestManager(scene);
+      this.questManager.assignRandomQuests(5); // 5 quests at game start
     }
 
     // Start render loop
@@ -118,8 +124,13 @@ export class GameEngine {
   }
 
   public dispose(): void {
+    this.questManager?.dispose();
     this.interactionSystem?.dispose();
     this.sceneManager?.dispose();
     this.engine.dispose();
+  }
+
+  public getQuestManager(): QuestManager | null {
+    return this.questManager;
   }
 }
