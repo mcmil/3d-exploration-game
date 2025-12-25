@@ -66,7 +66,7 @@ export class MemoryClearGame {
     instructions.color = 'white';
     instructions.fontSize = 16;
     instructions.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    instructions.top = '-20px';
+    instructions.top = '-160px';
     instructions.height = '30px';
     instructions.zIndex = 5001;
     this.overlay.addControl(instructions);
