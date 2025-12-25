@@ -7,14 +7,17 @@ import {
   Vector3,
   Vector2,
 } from '@babylonjs/core';
+import { AudioManager } from './AudioManager';
 
 export class PlayerController {
   private scene: Scene;
+  private audioManager: AudioManager | null = null;
   private playerMesh: Mesh | null = null;
   private moveSpeed: number = 70.0; // Even faster for very responsive feel
   private rotationSpeed: number = 0.7; // Much faster rotation for instant direction changes
-  private readonly worldSize: number = 100; // World is 200x200, so ±100 from origin
+  private readonly worldSize: number = 175; // World is 350x350, so ±175 from origin
   private readonly playerRadius: number = 0.6; // Collision radius
+  private lastCollisionTime: number = 0; // Throttle collision sounds
 
   // Store eye components to prevent disposal
   private eyeMaterial: StandardMaterial | null = null;
@@ -26,6 +29,10 @@ export class PlayerController {
 
   constructor(scene: Scene) {
     this.scene = scene;
+  }
+
+  public setAudioManager(audioManager: AudioManager): void {
+    this.audioManager = audioManager;
   }
 
   public async create(): Promise<void> {
@@ -166,6 +173,13 @@ export class PlayerController {
       // Apply movement if no collision
       this.playerMesh.position.x = clampedX;
       this.playerMesh.position.z = clampedZ;
+    } else {
+      // Play collision sound (throttled to avoid spam)
+      const now = Date.now();
+      if (this.audioManager && now - this.lastCollisionTime > 200) { // Max once per 200ms
+        this.audioManager.play('collision');
+        this.lastCollisionTime = now;
+      }
     }
 
     // Rotate player to face movement direction (instant rotation)

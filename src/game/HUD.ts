@@ -15,7 +15,7 @@ export class HUD {
   private minimapContainer: Rectangle;
   private playerDot: Ellipse;
   private questDots: Map<string, Ellipse> = new Map();
-  private readonly worldSize: number = 100; // Match world boundaries
+  private readonly worldSize: number = 175; // Match world boundaries (350x350 map)
   private readonly minimapSize: number = 150;
 
   constructor(scene: Scene) {

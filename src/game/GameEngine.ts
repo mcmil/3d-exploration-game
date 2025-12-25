@@ -79,6 +79,9 @@ export class GameEngine {
       this.audioManager = new AudioManager(scene);
       console.log('🎵 Audio manager initialized!');
 
+      // Give player access to audio manager for collision sounds
+      player.setAudioManager(this.audioManager);
+
       this.interactionSystem = new InteractionSystem(scene, player, this.audioManager);
       console.log('🔧 Interaction system initialized!');
 

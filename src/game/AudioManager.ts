@@ -6,17 +6,46 @@ export type SoundEffect =
   | 'interaction_success'
   | 'quest_complete'
   | 'sleigh_bells'
-  | 'ho_ho_ho';
+  | 'ho_ho_ho'
+  | 'collision';
 
 export class AudioManager {
   private scene: Scene;
   private sounds: Map<SoundEffect, Sound> = new Map();
   private sfxVolume: number = 0.5;
   private muted: boolean = false;
+  private audioContext: AudioContext;
+  private initialized: boolean = false;
 
   constructor(scene: Scene) {
     this.scene = scene;
+    this.audioContext = new AudioContext();
+
+    // Try to initialize sounds immediately
     this.initializeSounds();
+
+    // Also resume audio context on first user interaction
+    this.setupUserInteractionHandler();
+  }
+
+  /**
+   * Setup handler to resume AudioContext on user interaction
+   */
+  private setupUserInteractionHandler(): void {
+    const resumeAudio = async () => {
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+        console.log('🎵 AudioContext resumed');
+      }
+      if (!this.initialized) {
+        this.initializeSounds();
+      }
+    };
+
+    // Listen for any user interaction
+    document.addEventListener('click', resumeAudio, { once: true });
+    document.addEventListener('touchstart', resumeAudio, { once: true });
+    document.addEventListener('keydown', resumeAudio, { once: true });
   }
 
   /**
@@ -24,35 +53,42 @@ export class AudioManager {
    * Uses procedurally generated sounds via oscillators
    */
   private initializeSounds(): void {
-    // Create simple bell chime for entering interaction range
-    this.createBellChime('interaction_enter', [523.25, 659.25, 783.99], 0.3); // C5, E5, G5 (C major chord)
+    try {
+      // Create simple bell chime for entering interaction range
+      this.createBellChime('interaction_enter', [523.25, 659.25, 783.99], 0.3); // C5, E5, G5 (C major chord)
 
-    // Create soft whoosh for leaving interaction range
-    this.createWhoosh('interaction_leave');
+      // Create soft whoosh for leaving interaction range
+      this.createWhoosh('interaction_leave');
 
-    // Create success jingle for successful interaction
-    this.createSuccessJingle('interaction_success');
+      // Create success jingle for successful interaction
+      this.createSuccessJingle('interaction_success');
 
-    // Create festive completion sound
-    this.createQuestComplete('quest_complete');
+      // Create festive completion sound
+      this.createQuestComplete('quest_complete');
 
-    // Create sleigh bells sound
-    this.createSleighBells('sleigh_bells');
+      // Create sleigh bells sound
+      this.createSleighBells('sleigh_bells');
 
-    // Create ho-ho-ho laugh (represented by descending notes)
-    this.createHoHoHo('ho_ho_ho');
+      // Create ho-ho-ho laugh (represented by descending notes)
+      this.createHoHoHo('ho_ho_ho');
 
-    console.log('🎵 Audio system initialized with', this.sounds.size, 'sounds');
+      // Create collision sound
+      this.createCollision('collision');
+
+      this.initialized = true;
+      console.log('🎵 Audio system initialized with', this.sounds.size, 'sounds');
+    } catch (error) {
+      console.error('❌ Failed to initialize audio:', error);
+    }
   }
 
   /**
    * Create a bell chime sound
    */
   private createBellChime(name: SoundEffect, frequencies: number[], duration: number): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    const sampleRate = this.audioContext.sampleRate;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     for (let i = 0; i < length; i++) {
@@ -80,11 +116,10 @@ export class AudioManager {
    * Create a whoosh sound (white noise with filter)
    */
   private createWhoosh(name: SoundEffect): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    const sampleRate = this.audioContext.sampleRate;
     const duration = 0.15;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     for (let i = 0; i < length; i++) {
@@ -106,11 +141,11 @@ export class AudioManager {
    * Create a success jingle (ascending arpeggio)
    */
   private createSuccessJingle(name: SoundEffect): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    
+    const sampleRate = this.audioContext.sampleRate;
     const duration = 0.6;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     // Ascending notes: C5, E5, G5, C6
@@ -148,11 +183,11 @@ export class AudioManager {
    * Create quest completion fanfare
    */
   private createQuestComplete(name: SoundEffect): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    
+    const sampleRate = this.audioContext.sampleRate;
     const duration = 1.0;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     // Festive fanfare: C5, E5, G5, C6, E6
@@ -193,11 +228,11 @@ export class AudioManager {
    * Create sleigh bells sound
    */
   private createSleighBells(name: SoundEffect): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    
+    const sampleRate = this.audioContext.sampleRate;
     const duration = 1.2;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     // Multiple high-pitched bells ringing
@@ -233,11 +268,11 @@ export class AudioManager {
    * Create ho-ho-ho laugh sound
    */
   private createHoHoHo(name: SoundEffect): void {
-    const audioContext = new AudioContext();
-    const sampleRate = audioContext.sampleRate;
+    
+    const sampleRate = this.audioContext.sampleRate;
     const duration = 0.9;
     const length = sampleRate * duration;
-    const buffer = audioContext.createBuffer(1, length, sampleRate);
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
     const data = buffer.getChannelData(0);
 
     // Three "ho" sounds - descending bass notes
@@ -267,6 +302,34 @@ export class AudioManager {
       autoplay: false,
       loop: false,
       volume: this.sfxVolume
+    });
+
+    this.sounds.set(name, sound);
+  }
+
+  /**
+   * Create collision/bump sound
+   */
+  private createCollision(name: SoundEffect): void {
+    const sampleRate = this.audioContext.sampleRate;
+    const duration = 0.12;
+    const length = sampleRate * duration;
+    const buffer = this.audioContext.createBuffer(1, length, sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Short low thump sound
+    for (let i = 0; i < length; i++) {
+      const t = i / sampleRate;
+      // Low frequency thump (80 Hz) with noise
+      const thump = Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 35);
+      const noise = (Math.random() * 2 - 1) * Math.exp(-t * 50) * 0.2;
+      data[i] = (thump + noise) * 0.4;
+    }
+
+    const sound = new Sound(name, buffer, this.scene, null, {
+      autoplay: false,
+      loop: false,
+      volume: this.sfxVolume * 0.3
     });
 
     this.sounds.set(name, sound);
