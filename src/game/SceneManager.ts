@@ -20,7 +20,7 @@ export class SceneManager {
   private player: PlayerController | null = null;
   // Default camera angles for isometric view
   public readonly defaultAlpha: number = -Math.PI / 4; // 45 degrees from side
-  public readonly defaultBeta: number = Math.PI / 3.5; // ~51 degrees from top (isometric-ish)
+  public readonly defaultBeta: number = Math.PI / 3; // ~60 degrees from top (lower angle, closer to ground)
   public readonly defaultRadius: number = 30; // Distance from player
 
   constructor(engine: Engine) {
@@ -118,11 +118,11 @@ export class SceneManager {
     const worldGen = new WorldGenerator(this.scene);
 
     worldGen.generateWorld({
-      mapSize: 200,
-      numHouses: 25,
-      numTrees: 50,
-      numPowerPoles: 16,
-      numBoulders: 30,
+      mapSize: 350,
+      numHouses: 50,
+      numTrees: 80,
+      numPowerPoles: 24,
+      numBoulders: 45,
     });
 
     console.log('🏠 Generated', worldGen.getHouses().length, 'houses');

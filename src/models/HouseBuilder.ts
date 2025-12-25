@@ -148,55 +148,134 @@ export class HouseBuilder {
   private addWindows(parent: Mesh, width: number, height: number, depth: number): void {
     const windowMat = new StandardMaterial('windowMat', this.scene);
     windowMat.diffuseColor = new Color3(1, 1, 0.5); // Bright warm glow
-    windowMat.emissiveColor = new Color3(0.8, 0.8, 0.3); // Very strong glow
+    windowMat.emissiveColor = new Color3(0.25, 0.25, 0.08); // Reduced glow
     windowMat.backFaceCulling = false; // Visible from both sides
 
-    // Front windows - using boxes for better visibility
-    const frontWindow1 = MeshBuilder.CreateBox(
-      'window',
-      { width: 1.2, height: 1.4, depth: 0.1 },
-      this.scene
-    );
-    frontWindow1.position.set(-width * 0.25, height * 0.4, depth / 2 + 0.1);
-    frontWindow1.parent = parent;
-    frontWindow1.material = windowMat;
+    // Randomize which wall to place windows on (front, left, or right for visibility)
+    const wallChoice = Math.random();
 
-    const frontWindow2 = MeshBuilder.CreateBox(
-      'window',
-      { width: 1.2, height: 1.4, depth: 0.1 },
-      this.scene
-    );
-    frontWindow2.position.set(width * 0.25, height * 0.4, depth / 2 + 0.1);
-    frontWindow2.parent = parent;
-    frontWindow2.material = windowMat;
+    if (wallChoice < 0.33) {
+      // Front wall windows
+      const frontWindow1 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      frontWindow1.position.set(-width * 0.25, height * 0.4, depth / 2 + 0.1);
+      frontWindow1.parent = parent;
+      frontWindow1.material = windowMat;
+
+      const frontWindow2 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      frontWindow2.position.set(width * 0.25, height * 0.4, depth / 2 + 0.1);
+      frontWindow2.parent = parent;
+      frontWindow2.material = windowMat;
+    } else if (wallChoice < 0.66) {
+      // Right wall windows
+      const rightWindow1 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      rightWindow1.position.set(width / 2 + 0.1, height * 0.4, -depth * 0.25);
+      rightWindow1.rotation.y = Math.PI / 2;
+      rightWindow1.parent = parent;
+      rightWindow1.material = windowMat;
+
+      const rightWindow2 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      rightWindow2.position.set(width / 2 + 0.1, height * 0.4, depth * 0.25);
+      rightWindow2.rotation.y = Math.PI / 2;
+      rightWindow2.parent = parent;
+      rightWindow2.material = windowMat;
+    } else {
+      // Left wall windows
+      const leftWindow1 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      leftWindow1.position.set(-width / 2 - 0.1, height * 0.4, -depth * 0.25);
+      leftWindow1.rotation.y = -Math.PI / 2;
+      leftWindow1.parent = parent;
+      leftWindow1.material = windowMat;
+
+      const leftWindow2 = MeshBuilder.CreateBox(
+        'window',
+        { width: 1.2, height: 1.4, depth: 0.1 },
+        this.scene
+      );
+      leftWindow2.position.set(-width / 2 - 0.1, height * 0.4, depth * 0.25);
+      leftWindow2.rotation.y = -Math.PI / 2;
+      leftWindow2.parent = parent;
+      leftWindow2.material = windowMat;
+    }
   }
 
-  private addDoor(parent: Mesh, _width: number, height: number, depth: number): void {
-    // Door on front wall
-    const door = MeshBuilder.CreateBox(
-      'door',
-      { width: 0.9, height: 1.6, depth: 0.1 },
-      this.scene
-    );
-    door.position.set(0, height * 0.27, depth / 2 + 0.06);
-    door.parent = parent;
-
+  private addDoor(parent: Mesh, width: number, height: number, depth: number): void {
     const doorMat = new StandardMaterial('doorMat', this.scene);
     doorMat.diffuseColor = new Color3(0.4, 0.25, 0.15); // Brown wood
-    door.material = doorMat;
-
-    // Door handle
-    const handle = MeshBuilder.CreateSphere(
-      'handle',
-      { diameter: 0.08 },
-      this.scene
-    );
-    handle.position.set(0.3, height * 0.27, depth / 2 + 0.12);
-    handle.parent = parent;
 
     const handleMat = new StandardMaterial('handleMat', this.scene);
     handleMat.diffuseColor = new Color3(0.8, 0.7, 0.3); // Gold/brass
-    handle.material = handleMat;
+
+    // Randomize which wall to place door on (front, left, or right for visibility)
+    const wallChoice = Math.random();
+
+    if (wallChoice < 0.33) {
+      // Front wall door
+      const door = MeshBuilder.CreateBox(
+        'door',
+        { width: 0.9, height: 1.6, depth: 0.1 },
+        this.scene
+      );
+      door.position.set(0, height * 0.27, depth / 2 + 0.06);
+      door.parent = parent;
+      door.material = doorMat;
+
+      const handle = MeshBuilder.CreateSphere('handle', { diameter: 0.08 }, this.scene);
+      handle.position.set(0.3, height * 0.27, depth / 2 + 0.12);
+      handle.parent = parent;
+      handle.material = handleMat;
+    } else if (wallChoice < 0.66) {
+      // Right wall door
+      const door = MeshBuilder.CreateBox(
+        'door',
+        { width: 0.9, height: 1.6, depth: 0.1 },
+        this.scene
+      );
+      door.position.set(width / 2 + 0.06, height * 0.27, 0);
+      door.rotation.y = Math.PI / 2;
+      door.parent = parent;
+      door.material = doorMat;
+
+      const handle = MeshBuilder.CreateSphere('handle', { diameter: 0.08 }, this.scene);
+      handle.position.set(width / 2 + 0.12, height * 0.27, -0.3);
+      handle.parent = parent;
+      handle.material = handleMat;
+    } else {
+      // Left wall door
+      const door = MeshBuilder.CreateBox(
+        'door',
+        { width: 0.9, height: 1.6, depth: 0.1 },
+        this.scene
+      );
+      door.position.set(-width / 2 - 0.06, height * 0.27, 0);
+      door.rotation.y = -Math.PI / 2;
+      door.parent = parent;
+      door.material = doorMat;
+
+      const handle = MeshBuilder.CreateSphere('handle', { diameter: 0.08 }, this.scene);
+      handle.position.set(-width / 2 - 0.12, height * 0.27, -0.3);
+      handle.parent = parent;
+      handle.material = handleMat;
+    }
   }
 
   private addSatelliteDish(parent: Mesh, width: number, height: number, depth: number): void {

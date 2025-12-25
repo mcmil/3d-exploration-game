@@ -658,14 +658,48 @@ export class WorldGenerator {
   }
 
   private createLidlStore(mapSize: number): void {
-    // Create Lidl store building - positioned in front of camera view
+    // Find a random position that doesn't collide with houses
+    let x = 0, z = 0;
+    let validPosition = false;
+    let attempts = 0;
+    const minDistanceFromHouses = 25; // Minimum 25 units from any house
+    const minDistanceFromCenter = 20; // At least 20 units from spawn point
+
+    while (!validPosition && attempts < 200) {
+      // Random position in outer ring of map
+      x = (Math.random() - 0.5) * mapSize * 0.75;
+      z = (Math.random() - 0.5) * mapSize * 0.75;
+
+      // Check distance from spawn
+      const distFromCenter = Math.sqrt(x * x + z * z);
+      if (distFromCenter < minDistanceFromCenter) {
+        attempts++;
+        continue;
+      }
+
+      // Check distance from all houses
+      validPosition = true;
+      for (const house of this.houses) {
+        const housePos = house.position;
+        const dist = Math.sqrt(
+          Math.pow(x - housePos.x, 2) + Math.pow(z - housePos.z, 2)
+        );
+        if (dist < minDistanceFromHouses) {
+          validPosition = false;
+          break;
+        }
+      }
+
+      attempts++;
+    }
+
+    // Create Lidl store building at found position
     const lidlParent = new Mesh('lidlStore', this.scene);
-    // Place in +X, -Z direction (in front of isometric camera view)
-    lidlParent.position.set(mapSize * 0.25, 0, -mapSize * 0.25);
+    lidlParent.position.set(x, 0, z);
 
     // Rotate entrance to face player spawn at (0, 0, 0)
-    // Direction from Lidl to player: (-0.25*mapSize, 0, 0.25*mapSize)
-    lidlParent.rotation.y = Math.atan2(-0.25, 0.25);
+    // Direction from Lidl to player: (-x, 0, -z)
+    lidlParent.rotation.y = Math.atan2(-x, -z);
 
     // Main building body (large rectangular store)
     const building = MeshBuilder.CreateBox(
